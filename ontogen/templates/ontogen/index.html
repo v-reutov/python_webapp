@@ -1,0 +1,20 @@
+{% extends 'ontogen/base.html' %}
+
+{% block content %}
+<div id="content-main">
+    <form action="{% url 'ontogen:generate' %}" method="post" id="user_form" novalidate>
+        {% csrf_token %}
+        <p>Insert instruction text in the input area below and click 'Generate' button to get subject-ontology</p>
+        <div>
+            <textarea placeholder="Insert text here..." style="width: 100%;
+                    height: 50vh;
+                    resize: none;
+                    margin: 1em 0;
+                    box-sizing: border-box;" name="_text"></textarea>
+            <div class="submit-row">
+                <input type="submit" value="Generate Ontology" class="default" name="_generate" />
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}

@@ -1,6 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+
+from .core import OntologyGenerator
 
 # Create your views here.
 def index(request):
-    return HttpResponse('Hello web world!')
+    return render(request, 'ontogen/index.html', {})
+
+def generate_ont(request):
+    text = request.POST['_text']
+    ontology = OntologyGenerator.generate_ontology_from_text(text)
+    return render(request, 'ontogen/result.html', {'ontology' : ontology})

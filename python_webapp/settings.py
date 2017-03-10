@@ -26,6 +26,7 @@ SECRET_KEY = 'gevcm3y0f@63j+n+evxxb&42(n^^&-(q84oy4zzms@7w0af^%h'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '127.0.0.1',
     'vreutov.pythonanywhere.com'
 ]
 
@@ -33,6 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'ontogen.apps.OntogenConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

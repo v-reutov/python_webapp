@@ -1,0 +1,23 @@
+{% extends 'ontogen/base.html' %} {% block content %}
+<div>
+    <form action="{% url 'ontogen:index' %}" method="POST">
+        {% csrf_token %} {% if ontology %}
+        <h1>Resulting ontology.</h1>
+        <textarea readonly style="width: 100%;
+                    min-height: 50vh;
+                    resize: none;
+                    margin: 1em 0;
+                    box-sizing: border-box;">{{ ontology }}</textarea>
+        <div class="submit-row">
+            <!--<input type="submit" value="Load .ont" />-->
+            <input type="submit" value="Try again" />
+        </div>
+        {% else %}
+        <h1>No instruction was given.</h1>
+        <div class="submit-row">
+            <input type="submit" value="Go back" />
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock content %}

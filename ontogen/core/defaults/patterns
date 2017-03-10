@@ -1,0 +1,4 @@
+#object extraction
+NP<object> [[(]N<number>[)]] ::: name={object}[_{number}] type=concept
+#relation extraction
+NP<object_1> [[(]N<number_1>[)]] VP<action> IN<loc> NP<object_2> [[(]N<number_2>[)]] ::: source={object_1}[_{number_1}] relation={action}_{loc} dest={object_2}[_{number_2}] type=relation
