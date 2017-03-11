@@ -1,11 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Ontology Generator</title>
+    <title>Ontology Generator | VReutov</title>
     <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
-    <meta name="robots" content="NONE,NOARCHIVE" />
+    <link rel="shortcut icon" href="{%  static 'ontogen/favicon.ico' %}">
 </head>
 
 <body>
@@ -14,7 +15,7 @@
         <!-- Header -->
         <div id="header">
             <div id="branding">
-                <h1 id="site-name"><a href="/ontogen/">Ontology Generator v. 0.1</a></h1>
+                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.1</a></h1>
             </div>
             <div id="user-tools">
                 Welcome,
