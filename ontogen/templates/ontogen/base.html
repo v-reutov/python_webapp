@@ -7,6 +7,8 @@
     <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
     <link rel="shortcut icon" href="{%  static 'ontogen/favicon.ico' %}">
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body>
@@ -15,7 +17,7 @@
         <!-- Header -->
         <div id="header">
             <div id="branding">
-                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.1</a></h1>
+                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.2</a></h1>
             </div>
             <div id="user-tools">
                 Welcome,

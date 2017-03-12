@@ -1,23 +1,60 @@
-{% extends 'ontogen/base.html' %} {% block content %}
+{% extends 'ontogen/base.html' %}
+
+{% block content %}
 <div>
-    <form action="{% url 'ontogen:index' %}" method="POST">
-        {% csrf_token %} {% if ontology %}
-        <h1>Resulting ontology.</h1>
-        <textarea readonly style="width: 100%;
-                    min-height: 50vh;
-                    resize: none;
-                    margin: 1em 0;
-                    box-sizing: border-box;">{{ ontology }}</textarea>
-        <div class="submit-row">
-            <!--<input type="submit" value="Load .ont" />-->
-            <input type="submit" value="Try again" />
-        </div>
-        {% else %}
-        <h1>No instruction was given.</h1>
-        <div class="submit-row">
-            <input type="submit" value="Go back" />
-        </div>
-        {% endif %}
-    </form>
+    {% if error_message %}
+    <h1>{{ error_message }}</h1>
+    <div class="submit-row">
+        <a href="{% url 'ontogen:index' %}"><input type="button" value="Go back" /></a>
+    </div>
+    {% else %}
+    <h1>Resulting ontology</h1>
+    <textarea id="ontology" readonly>{{ ontology }}</textarea>
+    <div class="submit-row">
+        <input type="button" value="Download ontology" id="download"/>
+        <a href="{% url 'ontogen:index' %}"><input type="button" value="Try again" /></a> 
+    </div>
+    {% endif %}
 </div>
-{% endblock content %}
+{% endblock %}
+
+{% block head %}
+<style>
+    #ontology {
+        width: 100%;
+        min-height: 50vh;
+        resize: none;
+        margin: 1em 0;
+        box-sizing: border-box;
+    }
+</style>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script>
+    $(document).ready(function () {
+        function saveTextAsFile() {
+            var textToWrite = document.getElementById("ontology").value;
+            var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+            var fileNameToSaveAs = "ontology.ont";
+            var downloadLink = document.createElement("a");
+
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "My Hidden Link";
+            window.URL = window.URL || window.webkitURL;
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+
+        function destroyClickedElement(event) {
+            document.body.removeChild(event.target);
+        }
+
+        $("#download").click(function (e) {
+            e.preventDefault();
+            saveTextAsFile();
+        });
+ });  
+</script>
+{% endblock %}

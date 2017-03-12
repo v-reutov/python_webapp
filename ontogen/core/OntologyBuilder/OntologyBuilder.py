@@ -2,8 +2,9 @@ import json
 
 class OntologyBuilder:
     def __init__(self):
+        self.default_namespace = ""
         self.ontology_namespaces = {
-            "default": "",
+            "default": self.default_namespace,
             "ontolis-avis": "http://knova.ru/ontolis-avis",
             "owl": "http://www.w3.org/2002/07/owl",
             "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns",
@@ -13,7 +14,7 @@ class OntologyBuilder:
 
     def build_ontology(self, elements):
         concepts, relations = self.extract_concepts_and_relations(elements)
-        concepts, relations = self.add_default_fields(concepts, relations)
+        concepts, relations = self.add_default_fields(concepts, relations) #pylint: disable=E0632
         last_id = self.get_last_id(concepts, relations)
 
         concepts = self.create_layout(concepts)
@@ -28,7 +29,7 @@ class OntologyBuilder:
     def add_default_fields(self, *args):
         for arg in args:
             for item in arg:
-                item['namespace'] = ""
+                item['namespace'] = self.default_namespace
                 item['attributes'] = {}
         return args
 
@@ -76,7 +77,7 @@ class OntologyBuilder:
                 'id': str(element_id),
                 'name': 'a_part_of', # r_candidate['relation'],
                 'source_node_id': self.get_concept_id(concepts, r_candidate['source']),
-                'destination_node_id': self.get_concept_id(concepts, r_candidate['dest'])
+                'destination_node_id': self.get_concept_id(concepts, r_candidate['destination'])
             })
         return concepts, relations
 
