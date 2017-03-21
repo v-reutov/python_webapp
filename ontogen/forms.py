@@ -1,3 +1,8 @@
 from django import forms
+from . import models
 
-# class GenaratorConfigForm(forms.Form):
+class PatternForm(forms.ModelForm):
+    class Meta:
+        model = models.Pattern
+        fields = ['pattern_label', 'pattern_text', 'extracted_elements_type']
+        

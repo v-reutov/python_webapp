@@ -21,7 +21,7 @@ class PatternReader:
 
     def read(self, filename):
         source = open(filename, encoding='utf8')
-        print('==== PatternReader debug output start ====') #debug
+        # print('==== PatternReader debug output start ====') #debug
         for line in source:
             if line.startswith('#'):
                 continue
@@ -34,11 +34,11 @@ class PatternReader:
             # [{name: mapping} for name, mapping in line_splits[1].strip().split(' ')]
 
             regex = self.parse_pattern(pattern_source)
-            print(pattern_source + ' -> ' + regex) #debug
-            print('mappings: ', pattern_mappings) #debug
-            print() #debug
+            # print(pattern_source + ' -> ' + regex) #debug
+            # print('mappings: ', pattern_mappings) #debug
+            # print() #debug
             self.patterns.append({'regex': regex, 'mappings': pattern_mappings})
-        print('===== PatternReader debug output end =====') #debug
+        # print('===== PatternReader debug output end =====') #debug
         source.close()
         return self.patterns
 

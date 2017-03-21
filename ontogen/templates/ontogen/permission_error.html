@@ -1,0 +1,7 @@
+<div class="modal-header">
+    <span class="close" id="modal-close">&times;</span>
+    <h1>You don't have enough permissions to {{ action }}.</h1>
+</div>
+<div class="submit-row" style="margin: 0">
+    <input id="submit-button" type="button" value="Switch to another user" onclick="window.location='{% url 'ontogen:login' %}'" class="default"/>
+</div>

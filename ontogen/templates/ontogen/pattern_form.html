@@ -1,0 +1,94 @@
+{% load static %}
+<script src="{% static 'ontogen/dynamic-formset.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('.add-row').click(function() {
+            return addForm(this, 'mappings');
+        });
+        $('.delete-row').click(function() {
+            return deleteForm(this, 'mappings');
+        });
+    })
+</script>
+<style>
+    .submit-row {
+        margin: 0;
+    }
+
+    .add-row {
+        padding: 3px 10px;
+    }
+
+    .delete-row:hover,
+    .delete-row:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .Delete {
+        display: none;
+    }
+
+    .remove {
+        width: 20px;
+    }
+
+    table .errorlist {
+        margin-left: 0 !important;
+    }
+</style>
+<div class="modal-header">
+    <span class="close" id="modal-close">&times;</span>
+    <h1>{{ header }}</h1>
+</div>
+<form action="" method="post" id="form">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {{ form.non_field_errors }}
+    <fieldset class="module aligned ">
+    {% for field in form %}
+        <div class="form-row">
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        </div>
+    {% endfor %}
+    {{ formset.management_form }}
+    <h2>MAPPINGS</h2>
+    <table id="id_forms_table" width="100%">
+        <thead>
+            <th>Mapping label</th>
+            <th>Mapping value</th>
+            <th></th>
+        </thead>
+        <tbody>
+            {{ formset.non_field_errors }}
+            {% for form_item in formset.forms %}
+            {{ form_item.management_form }}
+    	    <tr id="{{ form_item.prefix }}-row" class="dynamic-form">
+    	        {% for field in form_item.visible_fields %}
+                    <td class="{{ field.label }}">{{ field }} {{ field.errors }}</td>
+                {% endfor %}
+    	        <td class="remove">
+    	            <span class="hidden delete-row" id="remove-{{ form_item.prefix }}-row">&#10006;</span>
+    	        </td>
+                <td class="hidden">
+                {% for field in form_item.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+                </td>
+            </tr>
+    	    {% endfor %}
+            <tr>
+    	        <td colspan="4"><input class="add-row" type="button" name="" value="&#10010; add mapping"></td>
+    	    </tr>
+        </tbody>
+    </table>
+    </fieldset>
+    <div class="submit-row">
+        <input id="submit-form-button" type="button" value="Save" class="default"/>
+    </div>
+</form>

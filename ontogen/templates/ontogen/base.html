@@ -6,34 +6,33 @@
     <title>Ontology Generator | VReutov</title>
     <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'ontogen/custom_base.css' %}" />
     <link rel="shortcut icon" href="{%  static 'ontogen/favicon.ico' %}">
     {% block head %}
     {% endblock %}
 </head>
 
 <body>
-    <!-- Container -->
     <div id="container">
-        <!-- Header -->
         <div id="header">
             <div id="branding">
-                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.2</a></h1>
+                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.3</a></h1>
             </div>
             <div id="user-tools">
                 Welcome,
-                <strong>User</strong>.
+                {% if user.is_authenticated %}
+                    <strong>{{ user }}</strong>
+                {% else %}
+                    <strong>guest</strong>
+                {% endif %}    
             </div>
         </div>
-        <!-- END Header -->
-        <!-- Content -->
         <div id="content" class="colM">
             {% block content %}
             {% endblock %}
         </div>
-        <!-- END Content -->
         <div id="footer"></div>
     </div>
-    <!-- END Container -->
 </body>
 
 </html>

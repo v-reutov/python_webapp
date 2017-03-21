@@ -1,0 +1,27 @@
+<div class="modal-header">
+    <span class="close" id="modal-close">&times;</span>
+    <h1>{{ pattern.pattern_label }}</h1>
+</div>
+<fieldset class="module aligned ">
+    <div class="form-row">
+        <div>
+            <label for="id_pattern_text">Pattern text:</label>
+            <input class="vTextField" id="id_pattern_text" type="text" value="{{ pattern.pattern_text }}" readonly/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div>
+            <label for="id_pattern_field">Extracted elements type:</label>
+            <input class="vTextField" id="id_pattern_field" type="text" value="{{ pattern.extracted_elements_type }}" readonly/>
+        </div>
+    </div>
+    <div>
+        <h2>MAPPINGS</h2>
+        {% for mapping in pattern.mappings.all %}
+        <div class="form-row">
+            <label for="id_pattern_field">{{ mapping }}:</label>
+            <input class="vTextField" id="id_pattern_field" type="text" value="{{ mapping.mapping_value }}" readonly/>
+        </div>
+        {% endfor %}
+    </div>
+</fieldset>

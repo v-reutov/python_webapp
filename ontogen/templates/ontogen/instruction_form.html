@@ -1,0 +1,29 @@
+<style>
+#id_instruction_label {
+    width : calc(100% - 170px);
+    box-sizing: border-box;
+}
+</style>
+<div class="modal-header">
+    <span class="close" id="modal-close">&times;</span>
+    <h1>{{ header }}</h1>
+</div>
+<form action="" method="post" id="form">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {{ form.non_field_errors }}
+    <fieldset class="module aligned ">
+    {% for field in form %}
+        <div class="form-row">
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        </div>
+    {% endfor %}
+    </fieldset>
+    <div class="submit-row">
+        <input id="submit-form-button" type="button" value="Save" class="default"/>
+    </div>
+</form>

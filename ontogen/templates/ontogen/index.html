@@ -1,31 +1,48 @@
-{% extends 'ontogen/base.html' %} {% block content %}
-<div id="content-main">
-    <form action="{% url 'ontogen:generate' %}" method="post" id="user_form">
-        {% csrf_token %}
-        <fieldset class="module">
-            <legend>Select an instruction</legend>
-            <div class="form-row">
-                {% for instruction in instructions %}
-                <input type="radio" name="instruction" id="instruction{{ forloop.counter }}" value="{{ instruction.id }}"/>
-                <label for="instruction{{ forloop.counter }}">{{ instruction }}</label><br/>
-                {% endfor %}
-                <!--<input type="radio" name="instruction" id="instruction{{ forloop.counter }}" value="{{ instruction.id }}">
-                <label for="instruction{{ forloop.counter }}">Custom</label><br/>
-                <textarea rows="" cols=""></textarea>-->
+{% extends 'ontogen/base.html' %}
+{% block content %}
+    <div id="content-main">
+        <form action="{% url 'ontogen:generate' %}" method="post" id="user_form">
+            {% csrf_token %}
+            <h1 style="color: DimGray ">Repository tree</h1>
+            <div class="help-box" style="float: right">
+                <!--<h3>Select resources you want to use and click the "Generate ontology" button</h3>-->
             </div>
-        </fieldset>
-        <fieldset class="module">
-            <legend>Select patterns you want to use</legend>
-            <div class="form-row">
-                {% for pattern in patterns %}
-                <input type="checkbox" name="patterns[]" id="pattern{{ forloop.counter }}" value="{{ pattern.id }}"/>
-                <label for="pattern{{ forloop.counter }}">{{ pattern }}</label><br/>
-                {% endfor %}
+            <div id="tree" ></div>        
+            <div class="submit-row">
+                <input id="submit-button" type="submit" value="Generate Ontology" class="default" name="_generate" />
             </div>
-        </fieldset>
-        <div class="submit-row">
-            <input type="submit" value="Generate Ontology" class="default" name="_generate" />
+        </form>
+        <div id="modal-info" class="modal">
+            <div id = "modal-content" class="modal-content"></div>
         </div>
-    </form>
-</div>
-{% endblock content %}
+    </div>
+{% endblock %}
+
+{% load static %}
+{% block head %}
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="{% static 'ontogen/tree/res/lib/jstree/themes/default/style.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'ontogen/tree/res/lib/jstree/themes/proton/style.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'ontogen/tree/tree_style.css' %}" />
+    <link rel="stylesheet" href="{% static 'ontogen/custom_admin.css' %}" />
+    <link rel="stylesheet" href="{% static 'ontogen/modal.css' %}" />
+    <script src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'ontogen/tree/res/lib/jstree/jstree.min.js' %}"></script>
+    <script src="{% static 'ontogen/tree/tree_functions.js' %}"></script>
+    <script src="{% static 'ontogen/tree/tree.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#user_form').submit(function () {
+                var checked_ids = $("#tree").jstree("get_checked", null, true);
+                // append data to post
+                $(this).append('<input type="hidden" id="checked_ids" name="checked_ids" value="'+ checked_ids +'"/>');
+            });
+
+            window.onclick = function(event) {
+                if (event.target == document.getElementById('modal-info')) {
+                    event.target.style.display = "none";
+                }
+            };
+        });
+    </script>
+{% endblock %}

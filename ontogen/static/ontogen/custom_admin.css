@@ -2,3 +2,7 @@
     width : calc(100% - 170px);
     box-sizing: border-box;
 }
+
+.help-box {
+    float: right;
+}

@@ -1,0 +1,11 @@
+#container {
+    min-width: 0;
+}
+
+#content {
+    padding: 2%;
+}
+
+/*.module {
+    margin-bottom: 0;
+}*/

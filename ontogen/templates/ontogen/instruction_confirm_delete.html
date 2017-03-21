@@ -1,0 +1,10 @@
+<div class="modal-header">
+    <span class="close" id="modal-close">&times;</span>
+    <h1>Are you sure you want to delete instruction "{{ object }}"?</h1>
+</div>
+<form action="" method="post" id="form">
+    {% csrf_token %}
+    <div class="submit-row" style="margin: 0">
+        <input id="submit-form-button" type="button" value="Confirm" class="default"/>
+    </div>
+</form>

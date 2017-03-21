@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+# from django.contrib.auth.views import login
 
 urlpatterns = [
     url(r'^\Z', include('home.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^ontogen/', include('ontogen.urls')),
+    # url(r'^accounts/login/$', login, {'template_name': 'admin/login.html'})
 ]

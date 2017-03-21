@@ -1,0 +1,12 @@
+/*.jstree li.jstree-open > a.jstree-anchor > i.jstree-checkbox,
+.jstree li.jstree-closed > a.jstree-anchor > i.jstree-checkbox*/
+/*li.jstree-node[aria-level="1"] > a.jstree-anchor > i.jstree-checkbox*/
+
+#tree {
+    margin: 1em;
+}
+
+.jstree li.jstree-open > a.jstree-anchor > i.jstree-checkbox,
+.jstree li.jstree-closed > a.jstree-anchor > i.jstree-checkbox {
+    display: none;
+}
