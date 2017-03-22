@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ontogen.apps.OntogenConfig',
-    'home.apps.HomeConfig',
-    'debug_panel',
+    'home.apps.HomeConfig'
 ]
 
 MIDDLEWARE = [
@@ -131,14 +130,5 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
-    },
-
-    # this cache backend will be used by django-debug-panel
-    'debug-panel': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/debug-panel-cache',
-        'OPTIONS': {
-            'MAX_ENTRIES': 200
-        }
     }
 }
