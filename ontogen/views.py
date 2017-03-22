@@ -106,7 +106,7 @@ class PatternDetailView(detail.DetailView):
     model = models.Pattern
 
 @ajax_login_only
-@permission_check('ontogen.add_pattern', 'create new patterns')
+@permission_check('ontogen.change_pattern', 'edit patterns')
 def PatternUpdateView(request, pattern_id):
     return PatternCreateUpdateView(request, pattern_id)
 
