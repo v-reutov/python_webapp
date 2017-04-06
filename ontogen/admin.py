@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 from .models import Pattern, Mapping, Instruction
 
+
 class MappingInlineFormset(models.BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -26,14 +27,14 @@ class MappingInline(admin.TabularInline):
 
 class PatternAdmin(admin.ModelAdmin):
     fieldsets = [
-        # (None, {'fields': ['pattern_label', 'pattern_text', 'extracted_elements_type']})
-        (None, {'fields': ['pattern_label', 'pattern_text', 'extracted_elements_type']})
+        (None, {'fields':
+                ['pattern_label', 'pattern_text', 'extracted_elements_type']})
     ]
     inlines = [MappingInline]
 
     class Media:
         css = {
-            'all' : ('ontogen/custom_admin.css',)
+            'all': ('ontogen/custom_admin.css',)
         }
 
 admin.site.register(Instruction)

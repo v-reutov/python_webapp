@@ -1,9 +1,11 @@
 import json
 
+
 class InvalidDataError(Exception):
     def __init__(self):
         message = "Invalid data passed"
         super().__init__(message)
+
 
 class OntoGen:
     def __init__(self):
@@ -37,10 +39,10 @@ class OntoGen:
 
     def construct_node(self, name):
         return {
-            'id' : str(self.get_next_id()),
-            'attributes' : {},
-            'namespace' : self.default_namespace,
-            'name' : str(name),
+            'id': str(self.get_next_id()),
+            'attributes': {},
+            'namespace': self.default_namespace,
+            'name': str(name),
         }
 
     def construct_relation(self, name, source, dest):
@@ -90,23 +92,25 @@ class OntoGen:
                 self.add_node_with_number(rel['destination'])
 
             self.relations.append(
-                self.construct_relation(rel['name'], rel['source'], rel['destination']))
+                self.construct_relation(
+                    rel['name'], rel['source'], rel['destination']))
 
     def add_node_with_number(self, concept_name):
         node = self.construct_node(concept_name)
         number_node = self.construct_node(self.get_next_n())
         self.nodes.extend([node, number_node])
-        has_number_rel = self.construct_relation_by_ids('has_number', node['id'], number_node['id'])
+        has_number_rel = self.construct_relation_by_ids(
+            'has_number', node['id'], number_node['id'])
         self.relations.append(has_number_rel)
 
     def get_subject_ontology(self):
         self.create_layout()
 
         ontology = {
-            "nodes" : self.nodes,
-            "relations" : self.relations,
-            "namespaces" : self.ontology_namespaces,
-            "last_id" : str(self.current_id),
+            "nodes": self.nodes,
+            "relations": self.relations,
+            "namespaces": self.ontology_namespaces,
+            "last_id": str(self.current_id),
         }
 
-        return json.dumps(ontology, ensure_ascii=False, indent=4)
+        return json.dumps(ontology, ensure_ascii=False)  # , indent=4)

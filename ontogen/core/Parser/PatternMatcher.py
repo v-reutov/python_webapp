@@ -1,6 +1,7 @@
 import re
 from pymystem3 import Mystem
 
+
 class PatternMatcher:
     def __init__(self):
         self.analyzer = Mystem()
@@ -42,7 +43,8 @@ class PatternMatcher:
         strings = []
         for item in analyzis:
             if 'analysis' in item:
-                gramar = next(iter(re.findall(r'(\w+)', self.get_gr(item) or "") or []), "")
+                gramar = next(iter(
+                    re.findall(r'(\w+)', self.get_gr(item) or "") or []), "")
                 strings.append(self.get_lex(item) + '<' + gramar + '>')
             else:
                 strings.append(item['text'])
@@ -83,6 +85,7 @@ class PatternMatcher:
 
     def get_gr(self, word):
         return self.get_item(word, "gr")
+
 
 class DictSet():
     def __init__(self):

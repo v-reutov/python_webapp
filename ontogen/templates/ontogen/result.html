@@ -9,7 +9,10 @@
     </div>
     {% else %}
     <h1>Resulting ontology</h1>
-    <textarea id="ontology" readonly>{{ ontology }}</textarea>
+    <textarea id="ontology" readonly hidden>{{ ontology }}</textarea>
+    <div style='transform: scale(0.65); margin-left: -25%; margin-top: -125px; margin-right: -25%; margin-bottom: -125px;'>
+        <iframe id="ontology-frame" class="ontology" src="https://multont.azurewebsites.net/vreutov/testontology" frameborder="1" allowfullscreen></iframe>
+    </div>
     <div class="submit-row">
         <input type="button" value="Download ontology" id="download"/>
         <a href="{% url 'ontogen:index' %}"><input type="button" value="Try again" /></a> 
@@ -20,9 +23,9 @@
 
 {% block head %}
 <style>
-    #ontology {
+    .ontology {
         width: 100%;
-        min-height: 50vh;
+        min-height: 100vh;
         resize: none;
         margin: 1em 0;
         box-sizing: border-box;
@@ -55,6 +58,46 @@
             e.preventDefault();
             saveTextAsFile();
         });
- });  
+    });
+
+    window.onload = function () {
+        if (window.addEventListener) {
+            window.addEventListener("message", listener);
+        } else {
+            // IE8
+            window.attachEvent("onmessage", listener);
+        }
+    }
+
+    function listener(event) {
+        if (event.data.fnc == 'OnInitiated') {
+            OnInitiated();
+        }
+    }
+
+    function OnLoadFrame() {
+        var snd = {
+            'fnc': "DoLoadOwl",
+            'ont': '{{ ontology|safe }}',
+            'name': 'testontology.ont'
+        }
+
+        window.frames[0].postMessage(snd, '*');
+    }
+
+    function OnInitiated() {
+        Load();
+    }
+
+    function Load() {
+        var snd = {
+            'fnc': 'Reset',
+        }
+        window.frames[0].postMessage(snd, '*');
+        var millisecondsToWait = 500;
+        setTimeout(function () {
+            OnLoadFrame();
+        }, millisecondsToWait);
+    } 
 </script>
 {% endblock %}

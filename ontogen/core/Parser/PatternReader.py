@@ -1,17 +1,18 @@
 import re
 
+
 class PatternReader:
     def __init__(self):
         self.patterns = []
         self.token_dictionary = {
-            'NP' : 'S',
-            'VP' : 'V',
-            'IN' : 'PR'
+            'NP': 'S',
+            'VP': 'V',
+            'IN': 'PR'
         }
 
         self.special_tokens = {
-            'N'  : r'\d+',
-            ' '  : r'\s*'
+            'N': r'\d+',
+            ' ': r'\s*'
         }
         self.special_chars = [
             '(', ')'
@@ -31,21 +32,18 @@ class PatternReader:
             line_splits = line.split(':::')
             pattern_source = line_splits[0].strip()
             pattern_mappings = line_splits[1].strip()
-            # [{name: mapping} for name, mapping in line_splits[1].strip().split(' ')]
 
             regex = self.parse_pattern(pattern_source)
-            # print(pattern_source + ' -> ' + regex) #debug
-            # print('mappings: ', pattern_mappings) #debug
-            # print() #debug
-            self.patterns.append({'regex': regex, 'mappings': pattern_mappings})
-        # print('===== PatternReader debug output end =====') #debug
+            self.patterns.append(
+                {'regex': regex, 'mappings': pattern_mappings})
         source.close()
         return self.patterns
 
     def parse_pattern(self, text):
         """translate pattern into regular expression"""
         tokens = self.parse_tokens(text)
-        return ''.join([self.translate_pattern_item(token) for token in tokens])
+        return ''.join(
+            [self.translate_pattern_item(token) for token in tokens])
 
     def translate_pattern_item(self, token):
         """translate pattern item into regular expression"""
@@ -146,13 +144,4 @@ class PatternReader:
         return tokens
 
     def is_optional(self, token):
-        # return token.startswith('[') and token.endswith(']')
-        return self.optional_token_pattern.match(token) != None
-
-def main():
-    PatternReader().read(r'.\Input\patterns.txt')
-    #print(patterns)
-
-if __name__ == '__main__':
-    main()
-            
+        return self.optional_token_pattern.match(token) is not None

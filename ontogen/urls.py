@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.contrib.auth.views import login
+from django.utils.translation import ugettext as _
 
 from . import views
 
@@ -22,13 +23,18 @@ urlpatterns = [
     url(r'^instruction/(?P<pk>[0-9]+)/$',
         views.InstructionDetailView.as_view(), name='instruction_view'),
     url(r'^instruction/add/$',
-        views.InstructionCreateView.as_view(extra_context={'header': 'Add new instruction'}),
+        views.InstructionCreateView.as_view(
+            # Translators: This string represents view's header
+            extra_context={'header': _('Add new instruction')}),
         name='instruction_add'),
     url(r'^instruction/(?P<pk>[0-9]+)/edit/$',
-        views.InstructionUpdateView.as_view(extra_context={'header': 'Edit instruction'}),
+        views.InstructionUpdateView.as_view(
+            # Translators: This string represents view's header
+            extra_context={'header': _('Edit instruction')}),
         name='instruction_update'),
     url(r'^instruction/(?P<pk>[0-9]+)/delete/$',
         views.InstructionDeleteView.as_view(), name='instruction_delete'),
-    url(r'^login/$', login, {'template_name': 'ontogen/login.html'}, name='login'),
+    url(r'^login/$', login,
+        {'template_name': 'ontogen/login.html'}, name='login'),
     url(r'^ok/', views.ok_response, name='ok'),
 ]
