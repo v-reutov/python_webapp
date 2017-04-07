@@ -1,21 +1,23 @@
 {% extends 'ontogen/base.html' %}
 
+{% trans "This is the title" as back_button %}
+
 {% block content %}
 <div>
     {% if error_message %}
     <h1>{{ error_message }}</h1>
     <div class="submit-row">
-        <a href="{% url 'ontogen:index' %}"><input type="button" value="Go back" /></a>
+        <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a>
     </div>
     {% else %}
-    <h1>Resulting ontology</h1>
+    <h1>{% trans "Resulting ontology" %}</h1>
     <textarea id="ontology" readonly hidden>{{ ontology }}</textarea>
     <div style='transform: scale(0.65); margin-left: -25%; margin-top: -125px; margin-right: -25%; margin-bottom: -125px;'>
         <iframe id="ontology-frame" class="ontology" src="https://multont.azurewebsites.net/vreutov/testontology" frameborder="1" allowfullscreen></iframe>
     </div>
     <div class="submit-row">
-        <input type="button" value="Download ontology" id="download"/>
-        <a href="{% url 'ontogen:index' %}"><input type="button" value="Try again" /></a> 
+        <input type="button" value="{% trans "Download ontology" %}" id="download"/>
+        <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a> 
     </div>
     {% endif %}
 </div>

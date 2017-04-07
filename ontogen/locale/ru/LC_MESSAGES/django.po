@@ -21,11 +21,11 @@ msgstr ""
 
 #: .\templates\ontogen\login.html:8
 msgid "Please correct the error below."
-msgstr ""
+msgstr "Исправьте ошибки"
 
 #: .\templates\ontogen\login.html:8
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Исправьте ошибки"
 
 #: .\templates\ontogen\login.html:24
 #, python-format
@@ -33,20 +33,22 @@ msgid ""
 "You are authenticated as %(user)s. Would you like to login to a different "
 "account?"
 msgstr ""
+"Вы вошли как %(user)s. Войти под другой учетной записью?"
+"account?"
 
 #: .\templates\ontogen\login.html:42
 msgid "Log in"
-msgstr ""
+msgstr "Войти"
 
 #. Translators: This string represents view's header
 #: .\urls.py:28
 msgid "Add new instruction"
-msgstr ""
+msgstr "Добавление инструкции"
 
 #. Translators: This string represents view's header
 #: .\urls.py:33
 msgid "Edit instruction"
-msgstr ""
+msgstr "Изменение инструкции"
 
 #: .\views.py:49
 msgid "No instruction was selected"
@@ -54,48 +56,48 @@ msgstr "Инструкция не выбрана"
 
 #: .\views.py:56
 msgid "No patterns were selected"
-msgstr ""
+msgstr "Шаблоны не выбраны"
 
 #: .\views.py:74
 msgid "Edit pattern"
-msgstr ""
+msgstr "Изменение шаблона"
 
 #: .\views.py:79
 msgid "Add new pattern"
-msgstr ""
+msgstr "Доабвление шаблона"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:117
 msgid "create new patterns"
-msgstr ""
+msgstr "создавать шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:130
 msgid "edit patterns"
-msgstr ""
+msgstr "изменять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:139
 msgid "delete patterns"
-msgstr ""
+msgstr "удалять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:159
 msgid "add instructions"
-msgstr ""
+msgstr "добавлять инструкции"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:171
 msgid "edit instructions"
-msgstr ""
+msgstr "добавлять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
 #: .\views.py:183
 msgid "delete instructions"
-msgstr ""
+msgstr "удалять шаблоны"

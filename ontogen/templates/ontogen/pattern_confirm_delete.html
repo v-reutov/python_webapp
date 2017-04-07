@@ -5,6 +5,6 @@
 <form action="" method="post" id="form">
     {% csrf_token %}
     <div class="submit-row" style="margin: 0">
-        <input id="submit-form-button" type="button" value="Confirm" class="default"/>
+        <input id="submit-form-button" type="button" value="{% trans "Confirm" %}" class="default"/>
     </div>
 </form>

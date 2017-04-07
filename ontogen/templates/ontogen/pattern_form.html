@@ -57,11 +57,11 @@
         </div>
     {% endfor %}
     {{ formset.management_form }}
-    <h2>MAPPINGS</h2>
+    <h2 style="text-transform: uppercase;">{% trans "Mappings" %}</h2>
     <table id="id_forms_table" width="100%">
         <thead>
-            <th>Mapping label</th>
-            <th>Mapping value</th>
+            <th>{% trans "Mapping label" %}</th>
+            <th>{% trans "Mapping value" %}</th>
             <th></th>
         </thead>
         <tbody>
@@ -83,12 +83,12 @@
             </tr>
     	    {% endfor %}
             <tr>
-    	        <td colspan="4"><input class="add-row" type="button" name="" value="&#10010; add mapping"></td>
+    	        <td colspan="4"><input class="add-row" type="button" name="" value="&#10010; {% trans "add" %}"></td>
     	    </tr>
         </tbody>
     </table>
     </fieldset>
     <div class="submit-row">
-        <input id="submit-form-button" type="button" value="Save" class="default"/>
+        <input id="submit-form-button" type="button" value="{% trans "Save" %}" class="default"/>
     </div>
 </form>

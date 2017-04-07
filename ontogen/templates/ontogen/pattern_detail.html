@@ -5,21 +5,21 @@
 <fieldset class="module aligned ">
     <div class="form-row">
         <div>
-            <label for="id_pattern_text">Pattern text:</label>
+            <label for="id_pattern_text" class="capitalized">{{ pattern.pattern_text.label }}:</label>
             <input class="vTextField" id="id_pattern_text" type="text" value="{{ pattern.pattern_text }}" readonly/>
         </div>
     </div>
     <div class="form-row">
         <div>
-            <label for="id_pattern_field">Extracted elements type:</label>
+            <label for="id_pattern_field" class="capitalized">{{ pattern.extracted_elements_type.label }}:</label>
             <input class="vTextField" id="id_pattern_field" type="text" value="{{ pattern.extracted_elements_type }}" readonly/>
         </div>
     </div>
     <div>
-        <h2>MAPPINGS</h2>
+        <h2 style="text-transform: uppercase;">{% trans "Mappings" %}</h2>
         {% for mapping in pattern.mappings.all %}
         <div class="form-row">
-            <label for="id_pattern_field">{{ mapping }}:</label>
+            <label for="id_pattern_field" class="capitalized">{{ mapping }}:</label>
             <input class="vTextField" id="id_pattern_field" type="text" value="{{ mapping.mapping_value }}" readonly/>
         </div>
         {% endfor %}

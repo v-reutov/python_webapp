@@ -1,11 +1,12 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from .core.Parser.PatternReader import PatternReader
 
 
 class Instruction(models.Model):
-    instruction_label = models.CharField(max_length=50)
-    instruction_text = models.TextField()
+    instruction_label = models.CharField(_("instruction label"), max_length=50)
+    instruction_text = models.TextField(_("instruction text"))
 
     def __str__(self):
         return self.instruction_label
@@ -19,18 +20,19 @@ class Instruction(models.Model):
 
 
 class Pattern(models.Model):
-    pattern_label = models.CharField(max_length=50)
-    pattern_text = models.CharField(max_length=200)
+    pattern_label = models.CharField(_("pattern label"), max_length=50)
+    pattern_text = models.CharField(_("pattern text"), max_length=200)
 
     CONCEPT = 'concept'
     RELATION = 'relation'
     ELEMENT_TYPES = (
-        (CONCEPT, 'Concept'),
-        (RELATION, 'Relation'),
+        (CONCEPT, _('Concept')),
+        (RELATION, _('Relation')),
     )
 
     extracted_elements_type = \
-        models.CharField(max_length=50, choices=ELEMENT_TYPES, default=CONCEPT)
+        models.CharField(
+            _("extracted elements type"), max_length=50, choices=ELEMENT_TYPES, default=CONCEPT)
 
     def __str__(self):
         return self.pattern_label
@@ -54,8 +56,8 @@ class Pattern(models.Model):
 class Mapping(models.Model):
     pattern = models.ForeignKey(Pattern, on_delete=models.CASCADE,
                                 related_name='mappings')
-    mapping_label = models.CharField(max_length=50)
-    mapping_value = models.CharField(max_length=100)
+    mapping_label = models.CharField(_("mapping label"), max_length=50)
+    mapping_value = models.CharField(_("mapping value"), max_length=100)
 
     def __str__(self):
         return self.mapping_label.replace('_', ' ')
@@ -71,7 +73,7 @@ class GeneratorConfig(models.Model):
 
 def get_instructions():
     return {
-        "text": "Instructions",
+        "text": ugettext("Instructions"),
         "type": "instruction-container",
         "children": [
             item.get_json() for item in Instruction.objects.all()
@@ -84,7 +86,7 @@ def get_instructions():
 
 def get_patterns():
     return {
-        "text": "Patterns",
+        "text": ugettext("Patterns"),
         "type": "pattern-container",
         "children": [
             item.get_json() for item in Pattern.objects.all()
@@ -97,7 +99,7 @@ def get_patterns():
 
 def get_resources():
     return {
-        "text": "Resources",
+        "text": ugettext("Resources"),
         "type": "resource-root",
         "children": [
             get_instructions(),
