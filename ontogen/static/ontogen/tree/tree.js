@@ -86,27 +86,27 @@ $(function () {
           var items = {
             getDetails: {
               "separator_after": true,
-              "label": "Details",
+              "label": gettext("Details"),
               "action": function (data) {
                 modal_load(url);
               }
             },
             createNode: {
-              "label": "Add",
+              "label": gettext("Add"),
               "action": function (obj) {
                 url = active_node["type"].match(/(\w+)-container/)[1] + "/add/"
                 modal_load(url);
               }
             },
             editNode: {
-              "label": "Edit",
+              "label": gettext("Edit"),
               "action": function (obj) {
                 url = url + "edit/"
                 modal_load(url);
               }
             },
             deleteNode: {
-              "label": "Delete",
+              "label": gettext("Remove"), 
               "action": function (obj) {
                 url = url + "delete/"
                 modal_load(url);

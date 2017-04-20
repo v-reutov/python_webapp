@@ -1,8 +1,9 @@
 {% extends 'ontogen/base.html' %}
 
-{% trans "This is the title" as back_button %}
+{% load i18n %}
 
 {% block content %}
+{% trans "Back to repository tree" as back_button %}
 <div>
     {% if error_message %}
     <h1>{{ error_message }}</h1>
@@ -10,13 +11,16 @@
         <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a>
     </div>
     {% else %}
-    <h1>{% trans "Resulting ontology" %}</h1>
-    <textarea id="ontology" readonly hidden>{{ ontology }}</textarea>
+    <h1>{% trans "Resulting ontologies" %}</h1>
     <div style='transform: scale(0.65); margin-left: -25%; margin-top: -125px; margin-right: -25%; margin-bottom: -125px;'>
-        <iframe id="ontology-frame" class="ontology" src="https://multont.azurewebsites.net/vreutov/testontology" frameborder="1" allowfullscreen></iframe>
+        <iframe id="ontology_frame" class="ontology" src="https://multont.azurewebsites.net/ontogen/task-ontology" frameborder="1"></iframe>
     </div>
+    <textarea id="subject-ontology" readonly hidden>{{ subject_ontology }}</textarea>
+    <textarea id="applied-ontology" readonly hidden>{{ applied_ontology }}</textarea>
+    <div id="ontology-prefix" hidden>[{{ datetime_prefix|date:"SHORT_DATETIME_FORMAT"}}]</div>
     <div class="submit-row">
-        <input type="button" value="{% trans "Download ontology" %}" id="download"/>
+        <input type="button" value="{% trans "Download subject ontology" %}" id="download-subject" />
+        <input type="button" value="{% trans "Download applied ontology" %}" id="download-applied" />
         <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a> 
     </div>
     {% endif %}
@@ -36,10 +40,10 @@
 <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 <script>
     $(document).ready(function () {
-        function saveTextAsFile() {
-            var textToWrite = document.getElementById("ontology").value;
+        function saveTextAsFile(prefix) {
+            var textToWrite = document.getElementById(prefix + "-ontology").value;
             var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
-            var fileNameToSaveAs = "ontology.ont";
+            var fileNameToSaveAs = $("#ontology-prefix").text() + " " + prefix + "-ontology.ont";
             var downloadLink = document.createElement("a");
 
             downloadLink.download = fileNameToSaveAs;
@@ -56,9 +60,14 @@
             document.body.removeChild(event.target);
         }
 
-        $("#download").click(function (e) {
+        $("#download-subject").click(function (e) {
             e.preventDefault();
-            saveTextAsFile();
+            saveTextAsFile("subject");
+        });
+
+        $("#download-applied").click(function (e) {
+            e.preventDefault();
+            saveTextAsFile("applied");
         });
     });
 
@@ -81,10 +90,11 @@
         var snd = {
             'fnc': "DoLoadOwl",
             'ont': '{{ ontology|safe }}',
-            'name': 'testontology.ont'
+            'name': 'subject-ontology.ont'
         }
 
         window.frames[0].postMessage(snd, '*');
+        $('#ontology_frame').removeAttr('hidden');
     }
 
     function OnInitiated() {

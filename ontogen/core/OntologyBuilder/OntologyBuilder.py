@@ -1,4 +1,6 @@
 import json
+import math
+
 
 class OntologyBuilder:
     def __init__(self):
@@ -14,15 +16,15 @@ class OntologyBuilder:
 
     def build_ontology(self, elements):
         concepts, relations = self.extract_concepts_and_relations(elements)
-        concepts, relations = self.add_default_fields(concepts, relations) #pylint: disable=E0632
+        concepts, relations = self.add_default_fields(concepts, relations)
         last_id = self.get_last_id(concepts, relations)
 
         concepts = self.create_layout(concepts)
         ontology = {
-            "last_id" : str(last_id),
-            "namespaces" : self.ontology_namespaces,
-            "nodes" : concepts,
-            "relations" : relations
+            "last_id": str(last_id),
+            "namespaces": self.ontology_namespaces,
+            "nodes": concepts,
+            "relations": relations
         }
         return json.dumps(ontology, indent=4, ensure_ascii=False)
 
@@ -44,24 +46,28 @@ class OntologyBuilder:
 
     @staticmethod
     def create_layout(concepts):
-        pos_x = 100
-        pos_y = 100
+        center = (100, 100)
+        radius = 50
+        angle_step = math.radians(360 / len(concepts))
+        angle = math.radians(90)
+
         for item in concepts:
-            item['position_x'] = pos_x
-            item['position_y'] = pos_y
-            # pos_x += 50
-            pos_y += 50
+            item['position_x'] = math.cos(angle)
+            item['position_y'] = math.sin(angle)
+            angle += angle_step
         return concepts
 
     def extract_concepts_and_relations(self, elements):
-        concepts_candidates = self.extract_elements_by_type(elements, 'concept')
+        concepts_candidates = \
+            self.extract_elements_by_type(elements, 'concept')
         relations = []
         concepts = []
         element_id = 0
         concept_id = 0
         for c_candidate in concepts_candidates:
             element_id += 1
-            concepts.append({'id': str(element_id), 'name': c_candidate['name']})
+            concepts.append(
+                {'id': str(element_id), 'name': c_candidate['name']})
             concept_id += 1
             element_id += 1
             concepts.append({'id': str(element_id), 'name': str(concept_id)})
@@ -70,14 +76,17 @@ class OntologyBuilder:
                               'name': 'has_number',
                               'source_node_id': str(element_id - 2),
                               'destination_node_id':  str(element_id - 1)})
-        relation_candidates = self.extract_elements_by_type(elements, 'relation')
+        relation_candidates = \
+            self.extract_elements_by_type(elements, 'relation')
         for r_candidate in relation_candidates:
             element_id += 1
             relations.append({
                 'id': str(element_id),
-                'name': 'a_part_of', # r_candidate['relation'],
-                'source_node_id': self.get_concept_id(concepts, r_candidate['source']),
-                'destination_node_id': self.get_concept_id(concepts, r_candidate['destination'])
+                'name': 'a_part_of',  # r_candidate['relation'],
+                'source_node_id':
+                    self.get_concept_id(concepts, r_candidate['source']),
+                'destination_node_id':
+                    self.get_concept_id(concepts, r_candidate['destination'])
             })
         return concepts, relations
 

@@ -1,13 +1,14 @@
 import re
 import json
 from django.http import HttpResponse
+from django.utils import formats
 from django.forms import inlineformset_factory
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import detail, edit
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse_lazy
-from django.utils.translation import ugettext as _
 from django.utils.translation import activate
+from django.utils.translation import ugettext as _
 
 from .utils.decorators import ajax_only, ajax_login_only
 from .utils.decorators import ontogen_login_required, permission_check
@@ -19,6 +20,7 @@ from . import forms
 
 @ontogen_login_required
 def index(request):
+    activate('ru')
     return render(request, 'ontogen/index.html', {
         'instructions': models.Instruction.objects.all(),
         'patterns': models.Pattern.objects.all()
@@ -39,7 +41,6 @@ def get_tree_data(request):
 
 @ontogen_login_required
 def generate_ont(request):
-    activate('ru')
     selected_nodes = request.POST.get('checked_ids', None)
     context = {}
     context['error_message'] = ""
@@ -62,8 +63,42 @@ def generate_ont(request):
         pk=selected_instruction_id).instruction_text
     patterns = [models.Pattern.objects.get(
         pk=pattern_id) for pattern_id in selected_patterns]
-    context['ontology'] = \
-        OntologyGenerator.generate_ontology_from_text(text, patterns)
+    subject_ontology, applied_ontology = \
+        OntologyGenerator.generate_ontologies_from_text(text, patterns)
+    context['subject_ontology'] = subject_ontology
+    context['applied_ontology'] = applied_ontology
+
+    rec = models.HistoryRecord()
+    rec.user = request.user
+    rec.instruction = models.Instruction.objects.get(
+        pk=selected_instruction_id)
+    rec.save()
+    for pattern in patterns:
+        rec.patterns.add(pattern)
+
+    prefix = formats.date_format(rec.datetime, "SHORT_DATETIME_FORMAT")
+    sub_ont = json.dumps(
+        json.loads(subject_ontology),
+        ensure_ascii=False, indent=4)
+    sub_ontology = models.Ontology(
+        ont=sub_ont, ontology_type='subject',
+        name=prefix + " subject-ontology")
+    sub_ontology.save()
+    rec.results.add(sub_ontology)
+
+    app_ont = json.dumps(
+        json.loads(applied_ontology),
+        ensure_ascii=False, indent=4)
+    app_ontology = models.Ontology(
+        ont=app_ont, ontology_type='applied',
+        name=prefix + " applied-ontology")
+    app_ontology.save()
+    rec.results.add(app_ontology)
+
+    context['ontology'] = OntologyGenerator.merge_ontologies(
+        subject_ontology, applied_ontology
+    )
+    context['datetime_prefix'] = rec.datetime
 
     return render(request, 'ontogen/result.html', context)
 
@@ -187,3 +222,10 @@ class InstructionUpdateView(ExtraContext, edit.UpdateView):
 class InstructionDeleteView(edit.DeleteView):
     model = models.Instruction
     success_url = reverse_lazy('ontogen:ok')
+
+
+@ontogen_login_required
+def usage_history(request):
+    context = {
+        'records': models.HistoryRecord.objects.all().order_by('-datetime')}
+    return render(request, 'ontogen/history.html', context)

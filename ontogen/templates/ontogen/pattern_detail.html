@@ -1,17 +1,20 @@
-<div class="modal-header">
-    <span class="close" id="modal-close">&times;</span>
+{% load i18n %}
+{% load ontogen_extras %}
+
+<div class="bot-modal-header">
+    <span class="mod-close" id="modal-close">&times;</span>
     <h1>{{ pattern.pattern_label }}</h1>
 </div>
 <fieldset class="module aligned ">
     <div class="form-row">
         <div>
-            <label for="id_pattern_text" class="capitalized">{{ pattern.pattern_text.label }}:</label>
+            <label for="id_pattern_text" class="capitalized">{{ pattern|field:"pattern_text"|verbose_name }}:</label>
             <input class="vTextField" id="id_pattern_text" type="text" value="{{ pattern.pattern_text }}" readonly/>
         </div>
     </div>
     <div class="form-row">
         <div>
-            <label for="id_pattern_field" class="capitalized">{{ pattern.extracted_elements_type.label }}:</label>
+            <label for="id_pattern_field" class="capitalized">{{ pattern|field:"extracted_elements_type"|verbose_name }}:</label>
             <input class="vTextField" id="id_pattern_field" type="text" value="{{ pattern.extracted_elements_type }}" readonly/>
         </div>
     </div>
@@ -19,7 +22,7 @@
         <h2 style="text-transform: uppercase;">{% trans "Mappings" %}</h2>
         {% for mapping in pattern.mappings.all %}
         <div class="form-row">
-            <label for="id_pattern_field" class="capitalized">{{ mapping }}:</label>
+            <label for="id_pattern_field">{{ mapping }}:</label>
             <input class="vTextField" id="id_pattern_field" type="text" value="{{ mapping.mapping_value }}" readonly/>
         </div>
         {% endfor %}

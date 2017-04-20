@@ -1,4 +1,18 @@
 {% extends 'ontogen/base.html' %}
+
+{% load i18n static %}
+
+{% block navigation %}
+<ul class="nav nav-pills">
+    <li class="active">
+        <a href="#">{% trans "Ontology generation" %}</a>
+    </li>
+    <li>
+        <a href="{% url 'ontogen:usage_history' %}">{% trans "Usage history" %}</a>
+    </li>
+</ul>
+{% endblock %}
+
 {% block content %}
     <div id="content-main">
         <form action="{% url 'ontogen:generate' %}" method="post" id="user_form">
@@ -10,27 +24,26 @@
             <div id="tree" ></div>        
             <div class="submit-row">
                 {% comment %}Translators: Button caption{% endcomment %}
-                <input id="submit-button" type="submit" value="{% trans "Generate Ontology" %}" class="default" name="_generate" />
+                <input id="submit-button" type="submit" value="{% trans "Generate Ontologies" %}" class="default" name="_generate" />
             </div>
         </form>
-        <div id="modal-info" class="modal">
-            <div id = "modal-content" class="modal-content"></div>
+        <div id="modal-info" class="bot-modal">
+            <div id = "modal-content" class="bot-modal-content"></div>
         </div>
     </div>
 {% endblock %}
 
-{% load static %}
 {% block head %}
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
     <link rel="stylesheet" href="{% static 'ontogen/tree/res/lib/jstree/themes/default/style.min.css' %}" />
     <link rel="stylesheet" href="{% static 'ontogen/tree/res/lib/jstree/themes/proton/style.min.css' %}"/>
     <link rel="stylesheet" href="{% static 'ontogen/tree/tree_style.css' %}" />
     <link rel="stylesheet" href="{% static 'ontogen/custom_admin.css' %}" />
     <link rel="stylesheet" href="{% static 'ontogen/modal.css' %}" />
-    <script src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'ontogen/tree/res/lib/jstree/jstree.min.js' %}"></script>
-    <script src="{% static 'ontogen/tree/tree_functions.js' %}"></script>
-    <script src="{% static 'ontogen/tree/tree.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ontogen/tree/res/lib/jstree/jstree.min.js' %}"></script>
+    <script type="text/javascript" src="{% url 'ontogen:javascript-catalog' %}"></script>
+    <script type="text/javascript" src="{% static 'ontogen/tree/tree.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ontogen/tree/tree_functions.js' %}"></script>
     <script>
         $(document).ready(function () {
             $('#user_form').submit(function () {

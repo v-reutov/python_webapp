@@ -2,7 +2,7 @@ from django.forms import models
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 
-from .models import Pattern, Mapping, Instruction
+from .models import Pattern, Mapping, Instruction, HistoryRecord, Ontology
 
 
 class MappingInlineFormset(models.BaseInlineFormSet):
@@ -39,3 +39,5 @@ class PatternAdmin(admin.ModelAdmin):
 
 admin.site.register(Instruction)
 admin.site.register(Pattern, PatternAdmin)
+admin.site.register(HistoryRecord)
+admin.site.register(Ontology)

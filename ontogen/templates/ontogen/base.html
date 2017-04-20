@@ -1,22 +1,24 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Ontology Generator | VReutov</title>
+    {% block head %}
+    {% endblock %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'ontogen/custom_base.css' %}" />
     <link rel="shortcut icon" href="{%  static 'ontogen/favicon.ico' %}">
-    {% block head %}
-    {% endblock %}
 </head>
 
 <body>
     <div id="container">
-        <div id="header">
+        <div id="header-block">
             <div id="branding">
-                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">Ontology Generator v. 0.3</a></h1>
+                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">OntoGen</a></h1>
             </div>
             <div id="user-tools">
                 {% comment %}Translators: User greetings{% endcomment %}
@@ -27,6 +29,10 @@
                     <strong>{% trans "guest" %},</strong>
                 {% endif %}    
             </div>
+        </div>
+        <div id="navigation-block">
+            {% block navigation %}
+            {% endblock %}
         </div>
         <div id="content" class="colM">
             {% block content %}

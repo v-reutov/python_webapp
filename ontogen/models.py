@@ -1,5 +1,8 @@
+import re
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, ugettext
+from django.contrib.auth.models import User
 
 from .core.Parser.PatternReader import PatternReader
 
@@ -23,16 +26,19 @@ class Pattern(models.Model):
     pattern_label = models.CharField(_("pattern label"), max_length=50)
     pattern_text = models.CharField(_("pattern text"), max_length=200)
 
+    NONE = None
     CONCEPT = 'concept'
     RELATION = 'relation'
     ELEMENT_TYPES = (
+        (NONE, '-'),
         (CONCEPT, _('Concept')),
         (RELATION, _('Relation')),
     )
 
     extracted_elements_type = \
         models.CharField(
-            _("extracted elements type"), max_length=50, choices=ELEMENT_TYPES, default=CONCEPT)
+            _("extracted elements type"), max_length=50,
+            choices=ELEMENT_TYPES, default=CONCEPT)
 
     def __str__(self):
         return self.pattern_label
@@ -42,8 +48,12 @@ class Pattern(models.Model):
         regex = reader.parse_pattern(self.pattern_text)
         pattern_mappings = ' '.join(
             [mapping.get() for mapping in self.mappings.all()])
-        pattern_mappings += ' type=' + self.extracted_elements_type
-        return {'regex': regex, 'mappings': pattern_mappings}
+        if self.extracted_elements_type is not None:
+            pattern_mappings += ' type=' + self.extracted_elements_type
+        return {
+            'name': self.pattern_label,
+            'regex': regex,
+            'mappings': pattern_mappings}
 
     def get_json(self):
         return {
@@ -66,9 +76,35 @@ class Mapping(models.Model):
         return self.mapping_label + '=' + self.mapping_value
 
 
-class GeneratorConfig(models.Model):
+class Ontology(models.Model):
+    name = models.CharField(_("ontology name"), max_length=50)
+    ont = models.TextField()
+
+    SUBJECT = 'subject'
+    APPLIED = 'applied'
+    ONTOLOGY_TYPES = (
+        (SUBJECT, _('subject ontology')),
+        (APPLIED, _('applied ontology')),
+    )
+
+    ontology_type = \
+        models.CharField(
+            _("ontology type"), max_length=50,
+            choices=ONTOLOGY_TYPES)
+
+
+class HistoryRecord(models.Model):
+    datetime = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User)
     instruction = models.ForeignKey(Instruction)
     patterns = models.ManyToManyField(Pattern)
+    results = models.ManyToManyField(Ontology)
+
+    def __str__(self):
+        return '[' + str(self.datetime) + '] ' + self.user.username
+
+    class Meta:
+        ordering = ('datetime', 'user')
 
 
 def get_instructions():
@@ -79,7 +115,7 @@ def get_instructions():
             item.get_json() for item in Instruction.objects.all()
         ],
         "li_attr": {
-            "class": "select-single"
+            "class": "select-single capitalized"
         }
     }
 
@@ -92,7 +128,7 @@ def get_patterns():
             item.get_json() for item in Pattern.objects.all()
         ],
         "li_attr": {
-            "class": "select-multiple"
+            "class": "select-multiple capitalized"
         }
     }
 
@@ -103,6 +139,9 @@ def get_resources():
         "type": "resource-root",
         "children": [
             get_instructions(),
-            get_patterns()
-        ]
+            get_patterns(),
+        ],
+        "li_attr": {
+            "class": "capitalized"
+        }
     }

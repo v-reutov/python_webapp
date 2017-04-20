@@ -1,4 +1,4 @@
-.modal {
+.bot-modal {
     display: none;
     position: fixed;
     z-index: 1;
@@ -15,7 +15,7 @@
     animation-duration: 0.4s
 }
 
-.modal-content {
+.bot-modal-content {
     position: fixed;
     bottom: 0;
     background-color: #fefefe;
@@ -28,30 +28,30 @@
     animation-duration: 0.4s
 }
 
-.close {
+.mod-close {
     color: white;
     float: right;
     font-size: 28px;
     font-weight: bold;
-    line-height: 45px;
+    line-height: 40px;
 }
 
-.close:hover,
-.close:focus {
+.mod-close:hover,
+.mod-close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
 
-.modal-header {
+.bot-modal-header {
     padding: 2px 16px;
     background-color: #417690;
     color: white;
 }
 
-.modal-body {padding: 2px 16px;}
+.bot-modal-body {padding: 2px 16px;}
 
-.modal-footer {
+.bot-modal-footer {
     padding: 2px 16px;
     background-color: #417690;
     color: white;
@@ -82,7 +82,7 @@
     box-sizing: border-box;
 }
 
-h1 {
+.bot-modal h1 {
     color : white;
     margin: 0.5em;
 }

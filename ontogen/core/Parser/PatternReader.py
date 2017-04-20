@@ -30,17 +30,27 @@ class PatternReader:
                 continue
 
             line_splits = line.split(':::')
-            pattern_source = line_splits[0].strip()
-            pattern_mappings = line_splits[1].strip()
+
+            if len(line_splits) > 2:
+                pattern_name = line_splits[0].strip()
+                pattern_source = line_splits[1].strip()
+                pattern_mappings = line_splits[2].strip()
+            else:
+                pattern_name = ''
+                pattern_source = line_splits[0].strip()
+                pattern_mappings = line_splits[1].strip()
 
             regex = self.parse_pattern(pattern_source)
             self.patterns.append(
-                {'regex': regex, 'mappings': pattern_mappings})
+                {'name': pattern_name,
+                 'regex': regex,
+                 'mappings': pattern_mappings})
         source.close()
         return self.patterns
 
     def parse_pattern(self, text):
         """translate pattern into regular expression"""
+        text = re.sub(r'(\s+)', ' ', text)
         tokens = self.parse_tokens(text)
         return ''.join(
             [self.translate_pattern_item(token) for token in tokens])
