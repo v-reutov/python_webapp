@@ -41,9 +41,13 @@ def get_sqrt(request):
         response['error'] = _('Number is required')
     else:
         try:
+            number = request.POST.get('number', None)
+            if (request.POST.get('use_precision', None)):
+                prec = request.POST.get('precision', None)
+            else:
+                prec = None
             response['result'] = \
-                sqrt.get_sqrt(request.POST.get('number', None),
-                              request.POST.get('precision', None))
+                sqrt.get_sqrt(number, prec)
         except Exception as e:
             response['error'] = str(e)
     return response
