@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^\Z', include('home.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^ontogen/', include('ontogen.urls')),
+    url(r'^sqrt/', include('sqrt_platform.urls')),
     # url(r'^accounts/login/$', login, {'template_name': 'admin/login.html'})
 ]

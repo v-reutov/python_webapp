@@ -1,0 +1,73 @@
+{% extends 'sqrt_platform/base.html' %}
+
+{% load i18n static %}
+{% get_language_info for get_current_language as lang %}
+
+{% block content %}
+<div class="calc-block">
+  <form id="form" method="post" action="">
+    {% csrf_token %}
+    <fieldset class="module aligned ">
+      <div id="number-block" class="form-row">
+        <label>{% trans "Number" %}</label> <input type="text" id="num" name="number" required/>
+      </div>
+      <div id="precision-block" class="form-row" hidden>
+        <label>{% trans "Precision" %}</label> <input type="number" min="1" max="100" step="1" id="precin" value="16" name="precision">
+      </div>
+      <div class="form-row">
+        <div style="margin-top: 10px">
+          <textarea id="answ" readonly></textarea>
+        </div>
+        <div id="test">
+        </div>
+      </div>
+      <div class="submit-row" style="margin-top: 10px">
+        <input type="button" id="solve" value='{% trans "Caclucate" %}'/>
+        <input type="button" id="precision_toggle" value='{% trans "Show precision" %}'/>
+      </div>
+    </fieldset>
+  </form>
+</div>
+{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
+<script>
+  var submit_form = function () {
+    $.ajax({
+        type: 'POST',
+        url:'{% url "sqrt_platform:get_sqrt" %}',
+        data: $('#form').serialize(),
+        success: function(data, textStatus, request) {
+          if (request.getResponseHeader('error') === 'None') {
+            document.getElementById('answ').value = request.getResponseHeader('result');
+          } else {
+            document.getElementById('answ').value = gettext(request.getResponseHeader('error'));
+            // $("#test").html(request.getResponseHeader('error'));
+          }
+        },
+        error: function(data, textStatus, request) {
+          alert('error')
+        }
+      });
+  };
+
+  var toggle_precision_block = function() {
+    prec_block = document.getElementById("precision-block")
+    button = document.getElementById("precision_toggle")
+
+    prec_block.hidden = !prec_block.hidden
+
+    if (prec_block.hidden) {
+      button.value = '{% trans "Show precision" %}'
+    } else {
+      button.value = '{% trans "Hide precision" %}'
+    }
+  }
+
+  window.onload = function() {
+    document.getElementById("solve").onclick = submit_form;
+    document.getElementById("precision_toggle").onclick = toggle_precision_block;
+  }
+</script>
+{% endblock %}

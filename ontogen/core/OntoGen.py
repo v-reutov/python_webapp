@@ -173,7 +173,8 @@ class OntoGen:
         nodes.append(begin)
 
         prev_node = begin
-        relations_candidates = self.get_elements_by_type(self.elements, 'relation')
+        relations_candidates = \
+            self.get_elements_by_type(self.elements, 'relation')
         for rel in relations_candidates:
             if 'applied_name' not in rel:
                 continue

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-21 01:37+0500\n"
+"POT-Creation-Date: 2017-05-22 00:39+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,27 +55,33 @@ msgstr "Название соотвествия"
 msgid "mapping value"
 msgstr "Значение соотвествия"
 
-#: .\ontogen\models.py:85
+#: .\ontogen\models.py:80
+#, fuzzy
+#| msgid "ontology type"
+msgid "ontology name"
+msgstr "тип онтологии"
+
+#: .\ontogen\models.py:86 .\ontogen\templates\ontogen\history.html:136
 msgid "subject ontology"
 msgstr "предметная онтология"
 
-#: .\ontogen\models.py:86
+#: .\ontogen\models.py:87 .\ontogen\templates\ontogen\history.html:138
 msgid "applied ontology"
 msgstr "прикладная онтология"
 
-#: .\ontogen\models.py:91
+#: .\ontogen\models.py:92
 msgid "ontology type"
 msgstr "тип онтологии"
 
-#: .\ontogen\models.py:111
+#: .\ontogen\models.py:112
 msgid "Instructions"
 msgstr "инструкции"
 
-#: .\ontogen\models.py:124
+#: .\ontogen\models.py:125
 msgid "Patterns"
 msgstr "шаблоны"
 
-#: .\ontogen\models.py:137
+#: .\ontogen\models.py:138
 msgid "Resources"
 msgstr "ресурсы"
 
@@ -114,7 +120,7 @@ msgstr "Использованная инструкция"
 #: .\ontogen\templates\ontogen\history.html:61
 #: .\ontogen\templates\ontogen\history.html:111
 #: .\ontogen\templates\ontogen\history.html:120
-#: .\ontogen\templates\ontogen\history.html:139
+#: .\ontogen\templates\ontogen\history.html:142
 msgid "Collapse block"
 msgstr "Свернуть блок"
 
@@ -131,11 +137,11 @@ msgid "Mappings"
 msgstr "Соответствия"
 
 #: .\ontogen\templates\ontogen\history.html:130
-#: .\ontogen\templates\ontogen\history.html:139
+#: .\ontogen\templates\ontogen\history.html:142
 msgid "Result"
 msgstr "Результат"
 
-#: .\ontogen\templates\ontogen\history.html:146
+#: .\ontogen\templates\ontogen\history.html:149
 msgid "Collapse record"
 msgstr "Свернуть запись"
 
@@ -223,54 +229,54 @@ msgstr "Добавление инструкции"
 msgid "Edit instruction"
 msgstr "Изменение инструкции"
 
-#: .\ontogen\views.py:55
+#: .\ontogen\views.py:52
 msgid "No instruction was selected"
 msgstr "Инструкция не выбрана"
 
-#: .\ontogen\views.py:62
+#: .\ontogen\views.py:59
 msgid "No patterns were selected"
 msgstr "Шаблоны не выбраны"
 
-#: .\ontogen\views.py:109
+#: .\ontogen\views.py:111
 msgid "Edit pattern"
 msgstr "Изменение шаблона"
 
-#: .\ontogen\views.py:114
+#: .\ontogen\views.py:116
 msgid "Add new pattern"
 msgstr "Доабвление шаблона"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:152
+#: .\ontogen\views.py:154
 msgid "create new patterns"
 msgstr "создавать шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:165
+#: .\ontogen\views.py:167
 msgid "edit patterns"
 msgstr "изменять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:174
+#: .\ontogen\views.py:176
 msgid "delete patterns"
 msgstr "удалять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:194
+#: .\ontogen\views.py:196
 msgid "add instructions"
 msgstr "добавлять инструкции"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:206
+#: .\ontogen\views.py:208
 msgid "edit instructions"
 msgstr "добавлять шаблоны"
 
 #. Translators: used to complete sentence "You don't have enough
 #. permissions to ..."
-#: .\ontogen\views.py:218
+#: .\ontogen\views.py:220
 msgid "delete instructions"
 msgstr "удалять шаблоны"

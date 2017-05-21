@@ -49,6 +49,7 @@ def resolve_names(patterns):
             if len(resolution_mapping) == 0:
                 raise Exception(
                     'Dependency pattern does not contain "name" mapping')
+
             pattern['regex'] = \
                 pattern['regex'].replace(dependency, resolution['regex'])
             pattern['mappings'] = \

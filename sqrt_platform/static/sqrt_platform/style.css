@@ -1,0 +1,16 @@
+.calc-block {
+    max-width: 400px;
+    width: 80%;
+}
+
+.calc-block .form-row input {
+    width : calc(100% - 185px);
+}
+
+.calc-block .submit-row input {
+    float: left;
+}
+
+.calc-block textarea {
+    width : calc(100% - 10px);
+}

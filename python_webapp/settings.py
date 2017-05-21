@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ontogen.apps.OntogenConfig',
     'home.apps.HomeConfig',
+    'sqrt_platform.apps.SqrtPlatformConfig',
 ]
 
 MIDDLEWARE = [

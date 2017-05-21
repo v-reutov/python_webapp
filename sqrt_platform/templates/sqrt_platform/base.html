@@ -1,0 +1,48 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% trans "Square root calculator" %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'sqrt_platform/style.css' %}" />
+    <script type="text/javascript" src="{% url 'sqrt_platform:javascript-catalog' %}"></script>
+    {% block head %}
+    {% endblock %}
+    <script>
+        var change_locale = function() {
+            window.location.replace($("#language").val() + '/');
+        };
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="branding">
+                <h1 id="site-name"><a href="{% url 'sqrt_platform:index' %}">{% trans "Square root calculator" %}</a></h1>
+            </div>
+            <div id="user-tools">
+                <select id="language" onchange="change_locale()">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_language_info_list for available_languages as languages %}
+                    {% for language in languages %}
+                        <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                            {{ language.name_local }} ({{ language.code }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div id="navigation-block">
+            {% block navigation %}
+            {% endblock %}
+        </div>
+        <div id="content" class="colM">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div id="footer"></div>
+    </div>
+</body>
+</html>

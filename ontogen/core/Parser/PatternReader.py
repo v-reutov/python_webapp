@@ -22,7 +22,6 @@ class PatternReader:
 
     def read(self, filename):
         source = open(filename, encoding='utf8')
-        # print('==== PatternReader debug output start ====') #debug
         for line in source:
             if line.startswith('#'):
                 continue
