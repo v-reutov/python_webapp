@@ -38,7 +38,7 @@ def get_sqrt(request):
     response['debug'] = request.POST
 
     if request.POST.get('number') == "":
-        response['error'] = 'Number is required'
+        response['error'] = _('Number is required')
     else:
         try:
             response['result'] = \
