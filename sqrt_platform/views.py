@@ -5,6 +5,7 @@ from django.utils.translation import activate
 from django.utils.translation import ugettext as _
 
 from .core import sqrt
+from .core import wolfram
 # Create your views here.
 
 LANGUAGES_CONTEXT = {'available_languages': ['ru', 'en']}
@@ -33,12 +34,10 @@ def index_locale(request, locale):
 @ajax_only
 def get_sqrt(request):
     response = HttpResponse()
-    response['result'] = None
-    response['error'] = None
     response['debug'] = request.POST
 
     if request.POST.get('number') == "":
-        response['error'] = _('Number is required')
+        response.write(_('Number is required'))
     else:
         try:
             number = request.POST.get('number', None)
@@ -46,8 +45,25 @@ def get_sqrt(request):
                 prec = request.POST.get('precision', None)
             else:
                 prec = None
-            response['result'] = \
-                sqrt.get_sqrt(number, prec)
+            result = sqrt.get_sqrt(number, prec)
+            response.write(result)
         except Exception as e:
-            response['error'] = str(e)
+            response.write(str(e))
+    return response
+
+
+@ajax_only
+def get_sqrt_ex(request):
+    response = HttpResponse()
+    response['debug'] = request.POST
+
+    if request.POST.get('number') == "":
+        response.write(_('Number is required'))
+    else:
+        try:
+            expression = request.POST.get('number', None)
+            result = wolfram.get_sqrt('sqrt({})'.format(expression))
+            response.write(result)
+        except Exception as e:
+            response.write(str(e))
     return response

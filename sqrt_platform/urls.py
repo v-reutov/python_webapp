@@ -19,4 +19,6 @@ urlpatterns = [
         views.index_locale, name='index_locale'),
     url(r'^calc/$',
         views.get_sqrt, name='get_sqrt'),
+    url(r'^calc_ex/$',
+        views.get_sqrt_ex, name='get_sqrt_ex'),
 ]

@@ -25,6 +25,7 @@
       </div>
       <div class="submit-row" style="margin-top: 10px">
         <input type="button" id="solve" value='{% trans "Caclucate" %}'/>
+        <input type="button" id="solve_ex" value='{% trans "Caclucate expression" %}'/>
         <input type="button" id="precision_toggle" value='{% trans "Show precision" %}'/>
       </div>
     </fieldset>
@@ -33,24 +34,30 @@
 {% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
 <script>
-  var submit_form = function () {
+  function post_form(post_url)
+  {
     $.ajax({
         type: 'POST',
-        url:'{% url "sqrt_platform:get_sqrt" %}',
+        url: post_url,
         data: $('#form').serialize(),
+        // global: false,
         success: function(data, textStatus, request) {
-          if (request.getResponseHeader('error') === 'None') {
-            document.getElementById('answ').value = request.getResponseHeader('result');
-          } else {
-            document.getElementById('answ').value = request.getResponseHeader('error');
-          }
+          document.getElementById('answ').value = request.responseText;
         },
         error: function(data, textStatus, request) {
+          alert(request.responseText)
         }
       });
+  }
+
+  var get_sqrt = function () {
+    post_form('{% url "sqrt_platform:get_sqrt" %}');
   };
+
+  var get_sqrt_ex = function () {
+    post_form('{% url "sqrt_platform:get_sqrt_ex" %}');
+  }
 
   var toggle_precision_block = function() {
     prec_block = document.getElementById("precision-block")
@@ -68,7 +75,8 @@
   }
 
   window.onload = function() {
-    document.getElementById("solve").onclick = submit_form;
+    document.getElementById("solve").onclick = get_sqrt;
+    document.getElementById("solve_ex").onclick = get_sqrt_ex;
     document.getElementById("precision_toggle").onclick = toggle_precision_block;
   }
 

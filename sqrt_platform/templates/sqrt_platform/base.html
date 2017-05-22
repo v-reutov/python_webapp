@@ -3,17 +3,36 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>{% trans "Square root calculator" %}</title>
     <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'sqrt_platform/style.css' %}" />
-    <script type="text/javascript" src="{% url 'sqrt_platform:javascript-catalog' %}"></script>
+    <!--<script type="text/javascript" src="{% url 'sqrt_platform:javascript-catalog' %}"></script>-->
+    <script type="text/javascript" src="{% static 'ontogen/tree/res/lib/jquery/jquery.min.js' %}"></script>
     {% block head %}
     {% endblock %}
     <script>
         var change_locale = function() {
             window.location.replace($("#language").val() + '/');
         };
+
+        var timer;
+
+        $(document).on({
+            ajaxStart: function() { 
+                timer && clearTimeout(timer);
+                timer = setTimeout(function()
+                {
+                     $('body').addClass("loading");
+                },
+                1000);
+            },
+            ajaxStop: function() { 
+                clearTimeout(timer);
+                $('body').removeClass("loading"); 
+            }    
+        });
     </script>
 </head>
 <body>
@@ -44,5 +63,6 @@
         </div>
         <div id="footer"></div>
     </div>
+    <div class="modal"><!-- Place at bottom of page --></div>
 </body>
 </html>
