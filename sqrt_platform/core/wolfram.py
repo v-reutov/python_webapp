@@ -20,7 +20,7 @@ def get_sqrt(expression):
                         .format(COOLDOWN_SEC - sec_since_last_query))
 
     LAST_QUERY_TIME = timezone.now()
-    if res['@success'] is True:
+    if res['@success'] == 'true':
         for pod in list(res.info):
             if str(pod['@title']).endswith('positive'):
                 return pod['subpod']['plaintext']
