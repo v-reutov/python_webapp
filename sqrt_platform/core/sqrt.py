@@ -1,5 +1,6 @@
 from mpmath import *
 from django.utils.translation import ugettext as _
+import re
 
 DEFAULT_PRECISION = 16
 
@@ -44,28 +45,28 @@ def format_output(output):
     return str(output).replace('j', 'i') .lstrip('(').rstrip(')')
 
 
-def parse_number(str_number, no_complex=False):
-    str_number = str_number.strip(' ')
+def parse_number(str_number):
+    try:
+        check_parentheses(str_number)
+        return parse_number_impl(clean_number(str_number))
+    except ValueError:
+        # ValueError on all known types
+        raise Exception(_('"{}" is not a real or complex number')
+                        .format(str_number))
 
+
+def parse_number_impl(str_number, no_complex=False):
     try:
         # Try parse a complex number
-        if '+' in str_number:
-            complex_parts = str_number.split('+')
-            if len(complex_parts) != 2:
-                # There can be only one '+' in complex number representaion
-                raise ValueError
-            else:
-                # Parse real and imaginary part via recursive call
-                # 'no_complex': complex number is present by real numbers only
-                return mpc(parse_number(complex_parts[0], True),
-                           parse_number(complex_parts[1].rstrip('i'), True))
-
-        # Only imaginary part given
-        if str_number.endswith('i'):
-            # Handle i separatly
-            if len(str_number) == 1:
-                return mpc(0, 1)
-            return mpc(0, parse_number(str_number.rstrip('i')))
+        complex_parts = \
+            re.findall(
+                r'^\s*(?:([+-]*\s*\w+(?:[.]\w*)?))?\s*([+-]*\s*\w*(?:[.]\w*)?\s*i)\s*$',
+                str_number)
+        if complex_parts != []:
+            return mpc(parse_number_impl(complex_parts[0][0], True),
+                       parse_number_impl(complex_parts[0][1].rstrip('i'), True))
+        else:
+            raise ValueError
     except ValueError:
         pass
 
@@ -79,6 +80,32 @@ def parse_number(str_number, no_complex=False):
     except ValueError:
         pass
 
-    # ValueError on all known types
-    raise Exception(_('"{}" is not a real or complex number')
-                    .format(str_number))
+    raise ValueError
+
+
+def clean_number(str_number):
+    # remove parentheses and whitespace
+    str_number = re.sub(r'\(', '', str_number)
+    str_number = re.sub(r'\)', '', str_number)
+    str_number = re.sub(r'\s+', '', str_number)
+    # -+ is -
+    str_number = re.sub(r'[+]*-[+]*', '-', str_number)
+    # -- is +
+    str_number = re.sub(r'--', '+', str_number)
+    # ++ is +
+    str_number = re.sub(r'[+]+', '+', str_number)
+
+    return str_number
+
+
+def check_parentheses(string):
+    count = 0
+    for i in string:
+        if i == "(":
+            count += 1
+        elif i == ")":
+            count -= 1
+        if count < 0:
+            return False
+    if count != 0:
+        raise ValueError

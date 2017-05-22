@@ -1,5 +1,6 @@
 from django.test import TestCase
-from sqrt_platform.core.sqrt import *
+from sqrt_platform.core.sqrt import get_sqrt
+from sqrt_platform.core.wolfram import get_sqrt as get_sqrt_ex
 # Create your tests here.
 
 
@@ -19,3 +20,7 @@ class CoreSqrtTestCase(TestCase):
     def test_precision(self):
         self.assertEqual(get_sqrt('2', 5), '1.4142')
         self.assertEqual(get_sqrt('1234', 9), '35.1283361')
+
+    def test_expression(self):
+        self.assertEqual(get_sqrt_ex('a ** 2'), 'a')
+        self.assertEqual(get_sqrt_ex('1 - sin(x) ** 2'), 'abs(cos(x))')

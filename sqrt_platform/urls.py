@@ -7,10 +7,13 @@ from django.views.decorators.http import last_modified
 
 from . import views
 
+# app_name is used to refence urls in template tags
 app_name = 'sqrt_platform'
-last_modified_date = timezone.now()
 
+# patterns describe how app dispathes http-requests
+# details: https://docs.djangoproject.com/en/1.11/topics/http/urls/
 urlpatterns = [
+    # js-catalog can be used to access translation fucntions on client-side
     url(r'^jsi18n/$',
         JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^$',
