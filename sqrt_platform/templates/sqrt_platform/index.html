@@ -47,7 +47,6 @@
           var output = document.getElementById('answ')
           output.value = request.responseText;
           autosize.update(output);
-          output.resize = "vertical"
         },
         error: function(data, textStatus, request) {
           alert(request.responseText)
