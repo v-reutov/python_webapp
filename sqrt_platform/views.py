@@ -8,7 +8,7 @@ from .core import sqrt
 from .core import wolfram
 # Create your views here.
 
-LANGUAGES_CONTEXT = {'available_languages': ['ru', 'en']}
+LANGUAGES_CONTEXT = {'available_languages': ['ru', 'en', 'es', 'zh-tw']}
 
 
 def ajax_only(function):
@@ -58,7 +58,7 @@ def get_sqrt_ex(request):
     response['debug'] = request.POST
 
     if request.POST.get('number') == "":
-        response.write(_('Number is required'))
+        response.write(_('Expression is required'))
     else:
         try:
             expression = request.POST.get('number', None)

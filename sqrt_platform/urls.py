@@ -15,7 +15,7 @@ urlpatterns = [
         JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^$',
         views.index, name='index'),
-    url(r'^(?P<locale>.{2})/$',
+    url(r'^(?P<locale>.+)/$',
         views.index_locale, name='index_locale'),
     url(r'^calc/$',
         views.get_sqrt, name='get_sqrt'),

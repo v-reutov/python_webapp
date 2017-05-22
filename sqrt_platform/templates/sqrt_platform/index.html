@@ -9,10 +9,10 @@
     {% csrf_token %}
     <fieldset class="module aligned ">
       <div id="number-block" class="form-row">
-        <label>{% trans "Number" %}</label> <input type="text" id="num" name="number" required/>
+        <label>{% trans "Number / Expression" %}:</label> <input type="text" id="num" name="number" required/>
       </div>
       <div id="precision-block" class="form-row" hidden>
-        <label>{% trans "Precision" %}</label>
+        <label>{% trans "Precision" %}:</label>
         <input type="number" min="1" max="1000" step="1" id="precin" value="16" name="precision" onkeyup="this.value = minmax(this.value, 1, 1000)"/>
         <input type="checkbox" id="use_precision" name="use_precision" hidden/>
       </div>
@@ -24,8 +24,8 @@
         </div>
       </div>
       <div class="submit-row" style="margin-top: 10px">
-        <input type="button" id="solve" value='{% trans "Caclucate" %}'/>
-        <input type="button" id="solve_ex" value='{% trans "Caclucate expression" %}'/>
+        <input type="button" id="solve" value='{% trans "Calculate" %}'/>
+        <input type="button" id="solve_ex" value='{% trans "Calculate expression" %}'/>
         <input type="button" id="precision_toggle" value='{% trans "Show precision" %}'/>
       </div>
     </fieldset>
@@ -34,6 +34,7 @@
 {% endblock %}
 
 {% block head %}
+<script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
 <script>
   function post_form(post_url)
   {
@@ -43,7 +44,10 @@
         data: $('#form').serialize(),
         // global: false,
         success: function(data, textStatus, request) {
-          document.getElementById('answ').value = request.responseText;
+          var output = document.getElementById('answ')
+          output.value = request.responseText;
+          autosize.update(output);
+          output.resize = "vertical"
         },
         error: function(data, textStatus, request) {
           alert(request.responseText)
@@ -78,6 +82,8 @@
     document.getElementById("solve").onclick = get_sqrt;
     document.getElementById("solve_ex").onclick = get_sqrt_ex;
     document.getElementById("precision_toggle").onclick = toggle_precision_block;
+
+    autosize(document.getElementById('answ'));
   }
 
   function minmax(value, min, max) 
