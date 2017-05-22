@@ -50,7 +50,7 @@ msgstr "Вычислить"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:28
 msgid "Calculate expression"
-msgstr ""
+msgstr "Вычислить выражение"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:29
 #: .\sqrt_platform\templates\sqrt_platform\index.html:75
