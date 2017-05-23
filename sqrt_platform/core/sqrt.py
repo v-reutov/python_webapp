@@ -57,16 +57,25 @@ def parse_number(str_number):
 
 def parse_number_impl(str_number, no_complex=False):
     try:
-        # Try parse a complex number
-        complex_parts = \
-            re.findall(
-                r'^\s*(?:([+-]*\s*\w+(?:[.]\w*)?))?\s*([+-]*\s*\w*(?:[.]\w*)?\s*i)\s*$',
-                str_number)
-        if complex_parts != []:
-            return mpc(parse_number_impl(complex_parts[0][0], True),
-                       parse_number_impl(complex_parts[0][1].rstrip('i'), True))
-        else:
-            raise ValueError
+        if not no_complex:
+            # Try parse a complex number
+            imagine_only = re.findall(r'^([+-]?\d*(?:[.]\d*)?i)$', str_number)
+            if imagine_only != []:
+                if imagine_only[0] == 'i':
+                    return mpc(0, 1)
+                return mpc(
+                    0, parse_number_impl(imagine_only[0].rstrip('i'), False))
+
+            complex_parts = \
+                re.findall(
+                    r'^(?:([+-]?\d+(?:[.]\d*)?))?([+-]?\d*(?:[.]\d*)?i)$',
+                    str_number)
+            if complex_parts != []:
+                return mpc(
+                    parse_number_impl(complex_parts[0][0], True),
+                    parse_number_impl(complex_parts[0][1].rstrip('i'), True))
+            else:
+                raise ValueError
     except ValueError:
         pass
 

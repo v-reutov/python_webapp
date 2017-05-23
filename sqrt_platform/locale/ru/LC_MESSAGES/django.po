@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-23 01:38+0500\n"
+"POT-Creation-Date: 2017-05-23 23:49+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,15 +19,15 @@ msgstr ""
 "10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%"
 "100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\sqrt_platform\core\sqrt.py:51
+#: .\sqrt_platform\core\sqrt.py:54
 msgid "\"{}\" is not a real or complex number"
 msgstr "\"{}\" не является действительным или комплексным числом"
 
-#: .\sqrt_platform\core\wolfram.py:19
+#: .\sqrt_platform\core\wolfram.py:20
 msgid "Next expression evaluate will be available in {} sec."
 msgstr "Следующее вычисление выражения будет доступно через {} сек."
 
-#: .\sqrt_platform\core\wolfram.py:33
+#: .\sqrt_platform\core\wolfram.py:36
 msgid "Invalid expression. Try again in {} sec."
 msgstr "Некорректное выражение. Попробуйте еще раз через {} сек."
 
@@ -35,6 +35,80 @@ msgstr "Некорректное выражение. Попробуйте еще
 #: .\sqrt_platform\templates\sqrt_platform\base.html:42
 msgid "Square root calculator"
 msgstr "Нахождение квадратного корня"
+
+#: .\sqrt_platform\templates\sqrt_platform\base.html:46
+#: .\sqrt_platform\templates\sqrt_platform\documentation.html:6
+msgid "Documentation"
+msgstr ""
+
+#: .\sqrt_platform\templates\sqrt_platform\base.html:47
+msgid "Choose language"
+msgstr "Выберите язык"
+
+#: .\sqrt_platform\templates\sqrt_platform\documentation.html:8
+msgid ""
+"\n"
+"    <p>\n"
+"        Enter the number or mathematical expression whose square root you "
+"want to find in the “Number/Expression” field. It can be an integer or a "
+"fractional number, a large number, a complex number.\n"
+"        <br/>Terms of use:\n"
+"        <ul>\n"
+"            <li>Use the symbol \".\" аs the separator of the whole and "
+"fractional part of the number.</li>\n"
+"            <li>Use \"i\" as the imaginary unit in the complex number.</li>\n"
+"            <li>It is possible to use in the expression the signs of "
+"arithmetic operations, the symbol \"^\" or \"**\" for exponentiation, "
+"parentheses, sqrt (expression) - square root, abs (expression) - module, as "
+"well as various trigonometric functions.</li>\n"
+"        </ul>\n"
+"    </p>\n"
+"    <p>\n"
+"        If you want to set the precision, open the menu “Show precision” and "
+"enter amount of decimal places in the answer.\n"
+"    </p>\n"
+"    <p>\n"
+"        Click the \"Calculate\" button to get the square root of the number "
+"and \"Calculate expression\" to get the square root of the expression. The "
+"resulting square root will be in the text field below the button. If no "
+"response was received, check the original data. If it is true, try again. If "
+"this problem persists, contact the support via <a href=\"http://sqrtme.mybb."
+"ru/\">forum</a> or by e-mail <a href=\"mailto:groot.sqrt@mail.ru\" target="
+"\"_top\">groot.sqrt@mail.ru</a>.\n"
+"    </p>\n"
+"    "
+msgstr ""
+"\n"
+"    <p>\n"
+"        В поле «Число/Выражение» введите число или математическое "
+"выражение, квадратный корень которого нужно найти. Число может быть "
+"вещественным, в том числе и длинным, а также комплексным.\n"
+"        <br/>Правила использования:\n"
+"        <ul>\n"
+"            <li>В качестве разделителя целой и дробной части числа "
+"используйте символ «.».</li>\n"
+"            <li>b.\tМнимая единица в комплексном числе обозначается «i».</"
+"li>\n"
+"            <li>c.\tВ выражении возможно использовать знаки арифметических "
+"операций, символ «^» или «**» для возведения в степень, скобки, функцию sqrt"
+"(выражение) – квадратный корень, abs(выражение) – модуль, а также различного "
+"рода тригонометрические функции.</li>\n"
+"        </ul>\n"
+"    </p>\n"
+"    <p>\n"
+"        Если необходимо задать точность, откройте меню «Показать точность» и "
+"введите число знаков после запятой в ответе.\n"
+"    </p>\n"
+"    <p>\n"
+"        Для получения ответа нажмите кнопку «Вычислить» для получения корня "
+"числа и «Вычислить выражение» для получения корня выражения. Полученный "
+"квадратный корень будет находиться в текстовом поле ниже кнопки. Если ответ "
+"не был получен, проверьте исходные данные. Если верно, то попробуйте ещё "
+"раз. В случае повторения данной проблемы обратитесь в службу поддержки: на "
+"<a href=\"http://sqrtme.mybb.ru/\">форум</a> или по электронной почте <a "
+"href=\"mailto:groot.sqrt@mail.ru\" target=\"_top\">groot.sqrt@mail.ru</a>.\n"
+"    </p>\n"
+"    "
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:12
 msgid "Number / Expression"
@@ -45,28 +119,36 @@ msgid "Precision"
 msgstr "Точность"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:27
+msgid "Having troubles with our app? Visit our forum!"
+msgstr "Возникли проблемы с приложением? Посетите наш форум!"
+
+#: .\sqrt_platform\templates\sqrt_platform\index.html:30
 msgid "Calculate"
 msgstr "Вычислить"
 
-#: .\sqrt_platform\templates\sqrt_platform\index.html:28
+#: .\sqrt_platform\templates\sqrt_platform\index.html:31
 msgid "Calculate expression"
 msgstr "Вычислить выражение"
 
-#: .\sqrt_platform\templates\sqrt_platform\index.html:29
-#: .\sqrt_platform\templates\sqrt_platform\index.html:75
+#: .\sqrt_platform\templates\sqrt_platform\index.html:32
+#: .\sqrt_platform\templates\sqrt_platform\index.html:77
 msgid "Show precision"
 msgstr "Показать точность"
 
-#: .\sqrt_platform\templates\sqrt_platform\index.html:77
+#: .\sqrt_platform\templates\sqrt_platform\index.html:79
 msgid "Hide precision"
 msgstr "Скрыть точность"
 
-#: .\sqrt_platform\views.py:40 .\sqrt_platform\views.py:61
+#: .\sqrt_platform\views.py:46
 msgid "Number is required"
 msgstr "Необходимо указать число"
 
+#: .\sqrt_platform\views.py:67
+msgid "Expression is required"
+msgstr "Необходимо указать выражение"
+
+#~ msgid "Forum"
+#~ msgstr "Форум"
+
 #~ msgid "Number"
 #~ msgstr "Число"
-
-#~ msgid "Expression is required"
-#~ msgstr "Необходимо указать выражение"

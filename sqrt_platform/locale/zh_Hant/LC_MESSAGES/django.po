@@ -15,24 +15,23 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: .\sqrt_platform\core\sqrt.py:54
 msgid "\"{}\" is not a real or complex number"
-msgstr "\"{}\" no es un número real o complejo"
+msgstr "\"{}\" 不是一個真實或複雜的數字"
 
 #: .\sqrt_platform\core\wolfram.py:20
 msgid "Next expression evaluate will be available in {} sec."
-msgstr "La siguiente de la evaluación expresión estará disponible en {} seg."
+msgstr "下一個表達式計算將在 {} 秒內可用。"
 
 #: .\sqrt_platform\core\wolfram.py:36
 msgid "Invalid expression. Try again in {} sec."
-msgstr "Expresión no válida. Inténtalo de nuevo en {} seg"
+msgstr "表達式無效 在 {} 秒內再試一次"
 
 #: .\sqrt_platform\templates\sqrt_platform\base.html:7
 #: .\sqrt_platform\templates\sqrt_platform\base.html:42
 msgid "Square root calculator"
-msgstr "Calculadora de raíz cuadrada"
+msgstr "平方根計算器"
 
 #: .\sqrt_platform\templates\sqrt_platform\base.html:46
 #: .\sqrt_platform\templates\sqrt_platform\documentation.html:6
@@ -41,7 +40,7 @@ msgstr ""
 
 #: .\sqrt_platform\templates\sqrt_platform\base.html:47
 msgid "Choose language"
-msgstr "elige lengua"
+msgstr "選擇語言"
 
 #: .\sqrt_platform\templates\sqrt_platform\documentation.html:8
 msgid ""
@@ -78,73 +77,62 @@ msgid ""
 msgstr ""
 "\n"
 "    <p>\n"
-"        Introduzca el número o la expresión matemática cuya raíz cuadrada "
-"desea buscar en el campo \"Número / expresión\". Puede ser un número entero o "
-"fraccional, un número grande, un número complejo.\n"
-"        <br/>Términos de Uso:\n"
+"        2)	在“數字/表達式”字段中輸入要查找其平方根的數字或數學表達式。 "
+"它可以是整數或小數，大數，複數.\n"
+"        <br/>使用條款:\n"
 "        <ul>\n"
-"            <li>a.	Utilice el símbolo \".\" Como el separador de la parte "
-"entera y fraccionaria del número.</li>\n"
-"            <li>Utilice \"i\" como la unidad imaginaria en el número complejo."
-"</li>\n"
-"            <li>Es posible utilizar en la expresión los signos de operaciones "
-"aritméticas, el símbolo \"^\" o \"**\" para exponenciación, paréntesis, sqrt "
-"(expresión) - raíz cuadrada, abs (expresión) - módulo, así como diversas "
-"funciones trigonométricas.</li>\n"
+"            <li>使用符號“.” 是數字的整體和分數部分的分隔符.</li>\n"
+"            <li>使用“i”作為複數中的虛數單位.</li>\n"
+"            <li>c.	在表達式中可以使用算術運算的符號，用於取冪的符號 “^” 或 “**”，"
+"括號，sqrt（表達式） - 平方根，abs（表達式） - 模塊以及各種三角函數.</li>\n"
 "        </ul>\n"
 "    </p>\n"
 "    <p>\n"
-"        Si desea establecer la precisión, abra el menú \"Mostrar precisión\" e"
-" ingrese la cantidad de decimales en la respuesta.\n"
+"        如果要設置精度，請打開菜單“顯示精度”，並在答案中輸入小數位數.\n"
 "    </p>\n"
 "    <p>\n"
-"        4)	Haga clic en el botón \"Calcular\" para obtener la raíz cuadrada "
-"del número y \"Calcular expresión\" para obtener la raíz cuadrada de la "
-"expresión. La raíz cuadrada resultante estará en el campo de texto debajo del "
-"botón. Si no se recibió ninguna respuesta, compruebe los datos originales. Si "
-"es cierto, vuelva a intentarlo. Si este problema persiste, póngase en contacto"
-" con el <a href=\"http://sqrtme.mybb.ru/"
-"\">foro</a> o por correo electrónico <a href=\"mailto:groot.sqrt@mail.ru\" "
-"target=\"_top\">groot.sqrt@mail.ru</a>.\n"
+"        4)	單擊“計算”按鈕獲取數字的平方根，並使用“計算表達式”獲取表達式的平方根. "
+"結果平方根將位於按鈕下方的文本框中. 如果沒有收到回复，請檢查原始數據. "
+"如果是，請再試一次. 如果此問題仍然存在，請聯繫支持 "
+"<a href=\"http://sqrtme.mybb.ru/\">論壇</a> 或通過電子郵件 "
+"<a href=\"mailto:groot.sqrt@mail.ru\" target=\"_top"
+"\">groot.sqrt@mail.ru</a>.\n"
 "    </p>\n"
 "    "
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:12
 msgid "Number / Expression"
-msgstr "Número / Expresión"
+msgstr "數 / 表达式"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:15
 msgid "Precision"
-msgstr "Precisión"
+msgstr "精確"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:27
 msgid "Having troubles with our app? Visit our forum!"
-msgstr "¿Tienes problemas con nuestra aplicación? ¡Visita nuestro foro!"
+msgstr "遇到麻煩與我們的應用程序？ 訪問我們的論壇"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:30
 msgid "Calculate"
-msgstr "Calcular"
+msgstr "計算"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:31
 msgid "Calculate expression"
-msgstr "Calcular la expresión"
+msgstr "计算表达式"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:32
 #: .\sqrt_platform\templates\sqrt_platform\index.html:77
 msgid "Show precision"
-msgstr "Mostrar precisión"
+msgstr "显示精度"
 
 #: .\sqrt_platform\templates\sqrt_platform\index.html:79
 msgid "Hide precision"
-msgstr "Ocultar precisión"
+msgstr "隐藏精度"
 
 #: .\sqrt_platform\views.py:46
 msgid "Number is required"
-msgstr "Número necesaria"
+msgstr "需要号码"
 
 #: .\sqrt_platform\views.py:67
 msgid "Expression is required"
-msgstr "Expresión necesaria"
-
-#~ msgid "Forum"
-#~ msgstr "Foro"
+msgstr "表達是必需的"

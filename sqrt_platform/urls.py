@@ -24,4 +24,6 @@ urlpatterns = [
         views.get_sqrt, name='get_sqrt'),
     url(r'^calc_ex/$',
         views.get_sqrt_ex, name='get_sqrt_ex'),
+    url(r'^docs/$',
+        views.documentation, name='documentation'),
 ]

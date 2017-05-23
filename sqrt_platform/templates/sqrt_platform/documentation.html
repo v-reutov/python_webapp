@@ -1,0 +1,26 @@
+{% extends 'sqrt_platform/base.html' %}
+
+{% load i18n static %}
+
+{% block content %}
+<h1>{% trans "Documentation" %}</h1>
+<div style="text-align: justify;">
+    {% blocktrans %}
+    <p>
+        Enter the number or mathematical expression whose square root you want to find in the “Number/Expression” field. It can be an integer or a fractional number, a large number, a complex number.
+        <br/>Terms of use:
+        <ul>
+            <li>Use the symbol "." аs the separator of the whole and fractional part of the number.</li>
+            <li>Use "i" as the imaginary unit in the complex number.</li>
+            <li>It is possible to use in the expression the signs of arithmetic operations, the symbol "^" or "**" for exponentiation, parentheses, sqrt (expression) - square root, abs (expression) - module, as well as various trigonometric functions.</li>
+        </ul>
+    </p>
+    <p>
+        If you want to set the precision, open the menu “Show precision” and enter amount of decimal places in the answer.
+    </p>
+    <p>
+        Click the "Calculate" button to get the square root of the number and "Calculate expression" to get the square root of the expression. The resulting square root will be in the text field below the button. If no response was received, check the original data. If it is true, try again. If this problem persists, contact the support via <a href="http://sqrtme.mybb.ru/">forum</a> or by e-mail <a href="mailto:groot.sqrt@mail.ru" target="_top">groot.sqrt@mail.ru</a>.
+    </p>
+    {% endblocktrans %}
+</div>
+{% endblock %}

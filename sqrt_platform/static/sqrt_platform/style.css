@@ -2,6 +2,19 @@
     min-width: 465px;
 }
 
+#header {
+    height: auto;
+}
+
+#header .references {
+    line-height: 43px;
+    margin-right: 10px;
+}
+
+.help {
+    text-align: right;
+}
+
 .submit-row {
     padding: 5px 5px;
 }

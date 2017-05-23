@@ -8,7 +8,7 @@ from .core import sqrt
 from .core import wolfram
 # Create your views here.
 
-LANGUAGES_CONTEXT = {'available_languages': ['ru', 'en', 'es', 'zh-tw']}
+LANGUAGES_CONTEXT = {'available_languages': ['ru', 'en', 'es', 'zh-hant']}
 
 
 def ajax_only(function):
@@ -28,7 +28,16 @@ def index(request):
 def index_locale(request, locale):
     activate(locale)
     request.session[translation.LANGUAGE_SESSION_KEY] = locale
-    return render(request, 'sqrt_platform/redir_to_index.html')
+    return render(
+        request,
+        'sqrt_platform/redir_to_index.html',
+        {'redirect': request.GET.get('redir', '/')})
+
+
+def documentation(request):
+    return render(
+        request,
+        'sqrt_platform/documentation.html', LANGUAGES_CONTEXT)
 
 
 @ajax_only
