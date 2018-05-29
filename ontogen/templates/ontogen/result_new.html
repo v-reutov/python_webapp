@@ -1,0 +1,87 @@
+{% extends 'ontogen/base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+{% trans "Back to repository tree" as back_button %}
+
+{% if error_message %}
+<h1>{{ error_message }}</h1>
+<div class="submit-row">
+    <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a>
+</div>
+{% else %}
+<h1>{% trans "Resulting ontologies" %}</h1>
+
+<div class="ontologies-wrapper">
+    <div class="left-ontology">
+        <div id="subject-ontology-vis" class="vis"></div>
+        <span>{% trans "Subject ontology" %}</span>
+    </div>
+    <div class="right-ontology">
+        <div id="task-ontology-vis" class="vis"></div>
+        <span>{% trans "Task ontology" %}</span>
+    </div>
+</div>
+
+<textarea id="subject-ontology" readonly hidden>{{ subject_ontology }}</textarea>
+
+<!-- TODO fix ontology name -->
+<textarea id="task-ontology" readonly hidden>{{ applied_ontology }}</textarea> 
+
+<div id="ontology-prefix" hidden>[{{ datetime_prefix|date:"SHORT_DATETIME_FORMAT"}}]</div>
+<div class="submit-row">
+    <input type="button" value="{% trans "Download subject ontology" %}" id="download-subject" />
+    <input type="button" value="{% trans "Download task ontology" %}" id="download-task" />
+    <a href="{% url 'ontogen:index' %}"><input type="button" value="{{ back_button }}" /></a> 
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<script type="text/javascript" src="{% static "ontogen/ontology/visualize.js" %}"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+<link rel="stylesheet" href="{% static "ontogen/ontology/style.css" %}">
+
+<script>
+    $(document).ready(function () {
+        function saveTextAsFile(prefix) {
+            var textToWrite = document.getElementById(prefix + "-ontology").value;
+            var textFileAsBlob = new Blob([textToWrite], { type: 'text/plain' });
+            var fileNameToSaveAs = $("#ontology-prefix").text() + " " + prefix + "-ontology.ont";
+            var downloadLink = document.createElement("a");
+
+            downloadLink.download = fileNameToSaveAs;
+            downloadLink.innerHTML = "My Hidden Link";
+            window.URL = window.URL || window.webkitURL;
+            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+            downloadLink.onclick = destroyClickedElement;
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+
+        function destroyClickedElement(event) {
+            document.body.removeChild(event.target);
+        }
+
+        $("#download-subject").click(function (e) {
+            e.preventDefault();
+            saveTextAsFile("subject");
+        });
+
+        $("#download-task").click(function (e) {
+            e.preventDefault();
+            saveTextAsFile("task");
+        });
+        
+        intializeOntology('subject-ontology-vis', $('#subject-ontology').text());
+        intializeOntology('task-ontology-vis', $('#task-ontology').text());
+    });
+</script>
+{% endblock %}

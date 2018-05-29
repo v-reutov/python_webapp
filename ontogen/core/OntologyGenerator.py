@@ -75,6 +75,19 @@ def generate_ontologies_from_text(text, pattern_set=None):
     return builder.get_subject_ontology(), builder.get_applied_ontology()
 
 
+def generate_subject_ontology(text, pattern_set):
+    reader = PatternReader()
+    matcher = PatternMatcher()
+    builder = OntoGen()
+
+    patterns = [pattern.get() for pattern in pattern_set if pattern.extracted_elements_type == pattern.CONCEPT]
+    patterns = resolve_names(patterns)
+
+    matches = matcher.parse_text(text, patterns)
+    builder.parse_elements(matches)
+    return builder.get_subject_ontology()
+
+
 def merge_ontologies(one, another):
     ont1 = json.loads(one)
     ont2 = json.loads(another)

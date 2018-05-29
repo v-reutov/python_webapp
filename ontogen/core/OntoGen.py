@@ -192,7 +192,7 @@ class OntoGen:
                 self.construct_relation_by_ids(
                     'next', prev_node['id'], action['id']),
                 self.construct_relation_by_ids(
-                    'from', from_node['id'], action['id']),
+                    'from', action['id'], from_node['id']),
                 self.construct_relation_by_ids(
                     'to', action['id'], to_node['id'])
             ])

@@ -46,5 +46,7 @@ urlpatterns = [
         views.InstructionDeleteView.as_view(), name='instruction_delete'),
     url(r'^login/$', login,
         {'template_name': 'ontogen/login.html'}, name='login'),
-    url(r'^ok/', views.ok_response, name='ok')
+    url(r'^ok/', views.ok_response, name='ok'),
+    url(r'^generate/$', views.generate_page, name='generate_new'),
+    url(r'^generate_subject/$', views.generate_subject_ont, name='generate_subject'),
 ]

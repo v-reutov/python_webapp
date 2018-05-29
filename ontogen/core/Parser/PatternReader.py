@@ -7,7 +7,8 @@ class PatternReader:
         self.token_dictionary = {
             'NP': 'S',
             'VP': 'V',
-            'IN': 'PR'
+            'IN': 'PR',
+            'ADJ': 'A'
         }
 
         self.special_tokens = {

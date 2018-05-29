@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'ontogen.apps.OntogenConfig',
     'home.apps.HomeConfig',
     'sqrt_platform.apps.SqrtPlatformConfig',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,20 @@ LOCALE_PATHS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+#################
+# Custom settings
+#################
+
+# CKEditor
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+        'toolbar_Basic': [
+            ['NumberedList', 'BulletedList', '-', 'Image']
+        ],
+        'toolbar': 'Basic',
+        'removePlugins': 'elementspath',
+        'removeDialogTabs': 'image:advanced',
+    },
+}

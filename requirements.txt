@@ -1,0 +1,17 @@
+appdirs==1.4.3
+Django==1.10.6
+inflect==0.2.5
+jaraco.itertools==2.0.1
+more-itertools==3.0.0
+mpmath==0.19
+packaging==16.8
+pymystem3==0.1.5
+pyparsing==2.2.0
+requests==2.13.0
+six==1.10.0
+whitenoise==3.3.0
+wolframalpha==3.0
+xmltodict==0.11.0
+django-quill==0.1.0
+django-ckeditor==5.4.0
+django-js-asset==1.1.0

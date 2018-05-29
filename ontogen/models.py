@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
 
 from .core.Parser.PatternReader import PatternReader
 
@@ -10,6 +11,8 @@ from .core.Parser.PatternReader import PatternReader
 class Instruction(models.Model):
     instruction_label = models.CharField(_("instruction label"), max_length=50)
     instruction_text = models.TextField(_("instruction text"))
+    
+    instruction_content = RichTextField(_("instruction content"), default='')
 
     def __str__(self):
         return self.instruction_label
@@ -18,7 +21,7 @@ class Instruction(models.Model):
         return {
             "id": "instruction" + str(self.id),
             "type": "instruction",
-            "text": str(self)
+            "text": str(self),
         }
 
 
@@ -132,6 +135,27 @@ def get_patterns():
         }
     }
 
+def get_multimedia_data():
+    return {
+        "text": ugettext("Multimedia data"),
+        "type": "pattern-container",
+        "children": [
+            {
+                "id": "obj1",
+                "type": "data",
+                "text": "test2"
+            },
+            {
+                "id": "obj2",
+                "type": "data",
+                "text": "test3"
+            }
+        ],
+        "li_attr": {
+            "class": "select-multiple capitalized"
+        }
+    }
+
 
 def get_resources():
     return {
@@ -140,6 +164,7 @@ def get_resources():
         "children": [
             get_instructions(),
             get_patterns(),
+            get_multimedia_data(),
         ],
         "li_attr": {
             "class": "capitalized"

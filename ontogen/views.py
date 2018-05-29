@@ -1,6 +1,6 @@
 import re
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import formats
 from django.forms import inlineformset_factory
 from django.shortcuts import render, get_object_or_404
@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import activate
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 
 from .utils.decorators import ajax_only, ajax_login_only
 from .utils.decorators import ontogen_login_required, permission_check
@@ -39,6 +40,27 @@ def get_tree_data(request):
     return HttpResponse(json.dumps(tree), content_type="application/json")
 
 
+def get_instruction_from_nodes(selected_nodes):
+    selected_instruction_id = \
+            int(re.findall(r'instruction(\d+)', selected_nodes)[0])
+    return models.Instruction.objects.get(pk=selected_instruction_id)
+
+
+def get_pattern_ids_from_nodes(selected_nodes):
+    return [int(pattern_id) for
+        pattern_id in re.findall(r'pattern(\d+)', selected_nodes)]
+
+
+def get_patterns_from_ids(pattern_ids):
+    return [models.Pattern.objects.get(
+        pk=int(pattern_id)) for pattern_id in pattern_ids]
+
+
+def get_patterns_from_nodes(selected_nodes):
+    selected_patterns = get_pattern_ids_from_nodes(selected_nodes)
+    return get_patterns_from_ids(selected_patterns)
+
+
 @ontogen_login_required
 def generate_ont(request):
     selected_nodes = request.POST.get('checked_ids', None)
@@ -46,32 +68,25 @@ def generate_ont(request):
     context['error_message'] = ""
 
     try:
-        selected_instruction_id = \
-            int(re.findall(r'instruction(\d+)', selected_nodes)[0])
+        instruction = get_instruction_from_nodes(selected_nodes)
     except (IndexError, TypeError):
         context['error_message'] = _('No instruction was selected')
         return render(request, 'ontogen/result.html', context)
 
-    selected_patterns = \
-        [int(pattern_id) for
-         pattern_id in re.findall(r'pattern(\d+)', selected_nodes)]
-    if selected_patterns == []:
+    patterns = get_patterns_from_nodes(selected_nodes)
+    if patterns == []:
         context['error_message'] = _('No patterns were selected')
         return render(request, 'ontogen/result.html', context)
 
-    text = models.Instruction.objects.get(
-        pk=selected_instruction_id).instruction_text
-    patterns = [models.Pattern.objects.get(
-        pk=pattern_id) for pattern_id in selected_patterns]
     subject_ontology, applied_ontology = \
-        OntologyGenerator.generate_ontologies_from_text(text, patterns)
+        OntologyGenerator.generate_ontologies_from_text(instruction.instruction_text, patterns)
+
     context['subject_ontology'] = subject_ontology
     context['applied_ontology'] = applied_ontology
 
     rec = models.HistoryRecord()
     rec.user = request.user
-    rec.instruction = models.Instruction.objects.get(
-        pk=selected_instruction_id)
+    rec.instruction = instruction
     rec.save()
     for pattern in patterns:
         rec.patterns.add(pattern)
@@ -100,7 +115,7 @@ def generate_ont(request):
     )
     context['datetime_prefix'] = rec.datetime
 
-    return render(request, 'ontogen/result.html', context)
+    return render(request, 'ontogen/result_new.html', context)
 
 
 def PatternCreateUpdateView(request, pattern_id=None):
@@ -197,7 +212,7 @@ class InstructionDetailView(detail.DetailView):
     name='dispatch')
 class InstructionCreateView(ExtraContext, edit.CreateView):
     model = models.Instruction
-    fields = ['instruction_label', 'instruction_text']
+    fields = ['instruction_label', 'instruction_content']
     success_url = reverse_lazy('ontogen:ok')
 
 
@@ -209,7 +224,7 @@ class InstructionCreateView(ExtraContext, edit.CreateView):
     name='dispatch')
 class InstructionUpdateView(ExtraContext, edit.UpdateView):
     model = models.Instruction
-    fields = ['instruction_label', 'instruction_text']
+    fields = ['instruction_label', 'instruction_content']
     success_url = reverse_lazy('ontogen:ok')
 
 
@@ -229,3 +244,32 @@ def usage_history(request):
     context = {
         'records': models.HistoryRecord.objects.all().order_by('-datetime')}
     return render(request, 'ontogen/history.html', context)
+
+@ontogen_login_required
+def generate_page(request):
+    selected_nodes = request.POST.get('checked_ids', None)
+
+    instruction = get_instruction_from_nodes(selected_nodes)
+    patterns = get_pattern_ids_from_nodes(selected_nodes)
+
+    return render(request, 'ontogen/generate.html', {
+        'instruction': instruction,
+        'patterns': json.dumps(patterns),
+    })
+
+
+@csrf_exempt
+@ajax_login_only
+def generate_subject_ont(request):
+    text = request.POST['text']
+    pattern_ids = request.POST.getlist('patterns[]')
+
+    print(pattern_ids)
+
+    patterns = get_patterns_from_ids(pattern_ids)
+    ont = OntologyGenerator.generate_subject_ontology(text, patterns)
+
+    return JsonResponse({
+        'status': 'OK',
+        'result': ont,
+    })
