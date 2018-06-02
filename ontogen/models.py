@@ -38,6 +38,8 @@ class Pattern(models.Model):
         (RELATION, _('Relation')),
     )
 
+    MAPPING_SEPARATOR = ';;;'
+
     extracted_elements_type = \
         models.CharField(
             _("extracted elements type"), max_length=50,
@@ -49,10 +51,11 @@ class Pattern(models.Model):
     def get(self):
         reader = PatternReader()
         regex = reader.parse_pattern(self.pattern_text)
-        pattern_mappings = ' '.join(
+        pattern_mappings = self.MAPPING_SEPARATOR.join(
             [mapping.get() for mapping in self.mappings.all()])
         if self.extracted_elements_type is not None:
-            pattern_mappings += ' type=' + self.extracted_elements_type
+            pattern_mappings += self.MAPPING_SEPARATOR \
+                + 'type=' + self.extracted_elements_type
         return {
             'name': self.pattern_label,
             'regex': regex,

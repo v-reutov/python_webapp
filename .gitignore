@@ -6,3 +6,9 @@ db.sqlite3
 .vscode
 
 static/
+
+# IntelliJ project data
+.idea/
+
+# Virtual env
+venv/

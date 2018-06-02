@@ -1,6 +1,7 @@
 import re
 from pymystem3 import Mystem
 
+from ontogen.models import Pattern
 
 class PatternMatcher:
     def __init__(self):
@@ -62,12 +63,13 @@ class PatternMatcher:
             return mapping
 
         regex = re.compile(pattern['regex'])
-        matches = [pattern['mappings'].format(**match.groupdict())
+        matches = [(pattern['mappings'].format(**match.groupdict()), match.group(0))
                    for match in regex.finditer(text)]
         results = []
-        for match in matches:
-            items = []
-            for pair in match.split(' '):
+        for match, matched_text in matches:
+            items = [('matched_text', matched_text)]
+            
+            for pair in match.split(Pattern.MAPPING_SEPARATOR):
                 name, mapping = pair.split('=')
                 items.append((name, clear_mapping(mapping)))
             results.append(dict(items))

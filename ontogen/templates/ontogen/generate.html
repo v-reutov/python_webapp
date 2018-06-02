@@ -5,107 +5,82 @@
 {% block content %}
 {% trans "Back to repository tree" as back_button %}
 
-<h1>{% trans "Generating ontology" %}</h1>
+{% comment %} <h1>{% trans "Generating ontology" %}</h1> {% endcomment %}
+{#<h1>Генерация прикладной онтологии</h1>#}
 <div id="split-wrapper">
     <div>
         {{ instruction.instruction_content | safe }}
     </div>
     <div id="rightBar">
-        <!-- <div class="panel-group" id="accordion">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Шаг 1. Построение предметной онтологии</a>
-                    </h4>
-                </div>
-                <div id="collapse1" class="panel-collapse collapse in">
-                    <div class="panel-body">
-                        <p>Выделите фрагмент инструкции, описывающий состав изделия, а затем нажмите на кнопку "Построить предметную онтологию".</p>
-                        <input type="button" value="Построить предметную онтологию" onclick="buildSubjectOntology();"/>
-                        <div id="subject-ontology-vis" class="vis"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Шаг 2. Обогащение предметной онтологии</a>
-                    </h4>
-                </div>
-                <div id="collapse2" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        Предметную онтологию можно пополнить с помощью изображений. Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
-                        Выделенный фрагмент будет продублирован ниже.
-
-                        <canvas id="preview"></canvas>
-                        <p id="preview-ocr"></p>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">Шаг 3. Построение онтологии задачи</a>
-                    </h4>
-                </div>
-                <div id="collapse3" class="panel-collapse collapse">
-                    <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                        et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-                        ut aliquip ex ea commodo consequat.</div>
-                </div>
-            </div>
-        </div> -->
-    
         <div id="tab-container">
-            
-            <!-- One "tab" for each step in the form: -->
             <div class="tab">
-                <p>Шаг 1. Построение предметной онтологии</p>
-                <p>Выделите фрагмент инструкции, описывающий состав изделия, а затем нажмите на кнопку "Далее"</p>
-                <input type="button" value="Построить предметную онтологию" onclick="buildSubjectOntology();"/>
-                <div id="subject-ontology-vis" class="vis"></div>
+                <p><strong>Шаг 1. Построение предметной онтологии</strong></p>
+                <p>Выделите фрагмент инструкции, описывающий состав изделия.</p>
+                <input type="button" value="Построить предметную онтологию" onclick="buildOntology('subject');"/>
             </div>
             
             <div class="tab">
-                <p>Шаг 2. Обогащение предметной онтологии</p>
-                <p>Предметную онтологию можно пополнить с помощью изображений. Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши. 
-                    Выделенный фрагмент будет продублирован ниже.</p>
-                <canvas id="preview"></canvas>
-                <p id="preview-ocr"></p></p>
-            </div>
-            
-            <div class="tab">Birthday:
-                <p><input placeholder="dd" oninput="this.className = ''"></p>
-                <p><input placeholder="mm" oninput="this.className = ''"></p>
-                <p><input placeholder="yyyy" oninput="this.className = ''"></p>
-            </div>
-            
-            <div class="tab">Login Info:
-                <p><input placeholder="Username..." oninput="this.className = ''"></p>
-                <p><input placeholder="Password..." oninput="this.className = ''"></p>
-            </div>
-            
-            <!-- <div style="overflow:auto;">
-                <div style="float:right;">
-                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-                <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+                <p><strong>Шаг 2. Обогащение предметной онтологии</strong></p>
+                <p>Предметную онтологию можно пополнить с помощью изображений.
+                    Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
+                    Выберите нужную деталь из выпадающего списка и нажмите "Привязать"
+                    для привязки выделенного изображения к детали агрегата.
+                </p>
+
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="subject-combo">Деталь:</label>
+                        <select class="form-control" id="subject-combo">
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-default" style="margin-top: -2px;" onclick="upload_image();">Привязать</button>
                 </div>
-            </div> -->
-            
-            <!-- Circles which indicates the steps of the form: -->
-            <div style="text-align:center;margin-top:10px">
-                <span class="step"></span>
-                <span class="step"></span>
-                <span class="step"></span>
-                <span class="step"></span>
+
+                <canvas id="preview"></canvas>
+                <p id="preview-ocr"></p>
             </div>
+            
+            <div class="tab">
+                <p><strong>Шаг 3. Построение онтологии задачи</strong></p>
+                <p>Выделите фрагмент инструкции, описывающий процесс сборки изделия.</p>
+                <input type="button" value="Построить онтологию задачи" onclick="buildOntology('task');"/>
+            </div>
+            
+            <div class="tab">
+                <p><strong>Генерация завершена</strong></p>
+
+                <input type="button" id="download-subject" value="Скачать предметную онтологию"/>
+                <input type="button" id="download-task" value="Скачать онтологию задачи"/>
+
+            </div>
+
+            <div class="spacer"></div>
+
+            <div id="nextPrev-container">
+                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Предыдущий шаг</button>
+                <button type="button" id="nextBtn" onclick="nextPrev(1)">Следующий шаг</button>
+            </div>
+
+            <!-- Circles which indicates the steps of the form: -->
+{#            <div style="text-align:center;margin-top:10px">#}
+{#                <span class="step"></span>#}
+{#                <span class="step"></span>#}
+{#                <span class="step"></span>#}
+{#                <span class="step"></span>#}
+{#            </div>#}
         </div>
 
-        <!-- <ul class="nav nav-pills nav-justified">
-            <li class="active"><a href="#">Предметная онтология</a></li>
-            <li><a href="#">Прикладная онтология</a></li>
-        </ul> -->
-        <div id="ontology-container" style="display:none"></div>
+        <div id="ontology-container" style="display: none">
+            <ul id="ontology-nav" class="nav nav-pills nav-justified">
+                <li class="active"><a data-toggle="tab" href="#subject">Предметная онтология</a></li>
+                <li><a data-toggle="tab" href="#task">Онтология задачи</a></li>
+            </ul>
+            <div id="ont-tabs" class="tab-content">
+                <div id="subject" class="tab-pane active"></div>
+                <div id="task" class="tab-pane"></div>
+            </div>
+        </div>
         <!-- <div id="subject-ontology-vis" class="vis"></div> -->
     </div>
 </div>
@@ -125,20 +100,30 @@
 <script type="text/javascript" src="{% static 'ontogen/ontology/visualize.js' %}"></script>
 <script type="text/javascript" src="{% static 'ontogen/lib/ocrad/ocrad.js' %}"></script>
 
-{% comment %} <script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script> {% endcomment %}
-
 <script>
     var patterns = JSON.parse('{{ patterns }}');
-    var subject_ontology;
+    var ontologies = {
+        subject: '',
+        task: ''
+    };
+
+    var ontologies_data = {
+        subject: [],
+        task: []
+    };
 
     var jcrop_api;
     var jcrop_enabled = true;
     var jcrop_target;
 
+    var crop_object;
     var previewXStart;
     var previewYStart;
     var previewHeight;
     var previewWidth;
+
+    var network;
+    var detailsCount;
 
     var currentTab = 0; // Current tab is set to be the first tab (0)
 
@@ -146,11 +131,11 @@
         showTab(currentTab); // Display the current tab
 
         function saveTextAsFile(prefix) {
-            var textToWrite = document.getElementById(prefix + "-ontology").value;
+            var textToWrite = ontologies[prefix];
             var textFileAsBlob = new Blob([textToWrite], {
                 type: 'text/plain'
             });
-            var fileNameToSaveAs = $("#ontology-prefix").text() + " " + prefix + "-ontology.ont";
+            var fileNameToSaveAs = prefix + "-ontology.ont";
             var downloadLink = document.createElement("a");
 
             downloadLink.download = fileNameToSaveAs;
@@ -172,7 +157,7 @@
             saveTextAsFile("subject");
         });
 
-        $("#download-applied").click(function (e) {
+        $("#download-task").click(function (e) {
             e.preventDefault();
             saveTextAsFile("applied");
         });
@@ -187,8 +172,7 @@
 
                 $(this).Jcrop({
                     onChange: updatePreview,
-                    onSelect: onSelectChanged,
-                    // aspectRatio : 1,
+                    onSelect: onSelectChanged
                 }, function() {
                         jcrop_api = this;
                     }
@@ -197,7 +181,7 @@
         });
 
         $(document).keyup(function(e) {
-            if (e.keyCode == 27) {
+            if (e.keyCode === 27) {
                 destroyJcropIfAny();
             }
         });
@@ -220,6 +204,8 @@
 
     function updatePreview(crop) {
         if(parseInt(crop.w) > 0) {
+            crop_object = crop;
+
             // Show image preview
             var canvas = $("#preview")[0];
             var context = canvas.getContext("2d");
@@ -227,7 +213,7 @@
             
             fitImageOn(canvas, jcrop_target, crop);
         }
-    };
+    }
 
     function onSelectChanged(crop) {
         if(parseInt(crop.w) > 0) {
@@ -270,75 +256,163 @@
         previewWidth  = renderableWidth;
 
         context.drawImage(jcrop_target, crop.x, crop.y, crop.w, crop.h, xStart, yStart, renderableWidth, renderableHeight);
-    };
+    }
 
     function recognizeNumber() {
         var canvas = document.getElementById("preview");
         var context = canvas.getContext("2d");
         
         var imageData = context.getImageData(previewXStart, previewYStart, previewWidth, previewHeight);
-        
+
+        var regex = /\d+/g;
+
         OCRAD(imageData, {
             numeric: true
         }, function(text) {
-            document.getElementById('preview-ocr').innerText = text;
-        })
+            console.log(text);
 
-        //Tesseract.recognize(imageData, {
-        //    tessedit_char_whitelist: '0123456789'
-        //})
-        //.then(function(result) {
-        //    document.getElementById('preview-ocr').innerText = result.text;
-        //})
+            var result;
+            while ((result = regex.exec(text)) !== null) {
+                  if (result[0] > 0 && result[0] <= detailsCount) {
+                    $('#subject-combo').val(result[0]);
+                    break;
+                }
+            }
+
+            {#document.getElementById('preview-ocr').innerText = text;#}
+        })
     }
 
-    function buildSubjectOntology() {
-        text = window.getSelection().toString();
+    function buildOntology(kind) {
+        var text = window.getSelection().toString();
 
         if (text === undefined || text === "") {
-            alert('{% trans "No text was selected." %}');
+            alert('{% trans "Текст не выбран" %}');
             return;
         }
 
-        post_data = {
+        var post_data = {
             'text': text,
             'patterns': patterns
+        };
+
+        if (kind === "subject") {
+            buildSubjectOntology(post_data);
+        } else if (kind === "task") {
+            buildTaskOntology(post_data);
+        } else {
+            alert("Unknown kind of ontology");
         }
+    }
 
-        $.post("{% url 'ontogen:generate_subject' %}", post_data, function (response) {
-            if (response.status == "OK") {
-                subject_ontology = response.result;
+    function buildSubjectOntology(data) {
+        var url = "{% url 'ontogen:generate_subject' %}";
+        var container = document.getElementById('subject');
 
-                var container = document.getElementById('ontology-container');
-                intializeOntology(container, response.result);
+        $.post(url, data, function (response) {
+            if (response.status === "OK") {
+                ontologies.subject = response.result;
+                var result = loadOntologyToContainer(container, response.result);
+                ontologies_data.subject = result.data;
 
-                container.getElementsByClassName('vis-network')[0].style.position = 'absolute';
-                container.style.display = '';
-
-                nextPrev(1);
+                loadSubjectCombo();
             } else {
                 alert('Something went wrong');
             }
         });
     }
 
+    function isNumber(str) {
+        return /^(0|[1-9]\d*)$/.test(str);
+    }
+
+    function loadSubjectCombo() {
+        detailsCount = 0;
+
+        var combo = document.getElementById('subject-combo');
+
+        var nodes = ontologies_data.subject.nodes;
+        var relations = ontologies_data.subject.edges;
+
+        var subject_nodes = nodes.get({
+            filter: function (item) {
+                return isNumber(item.label) === false;
+            }
+        });
+
+        function get_number(node_id) {
+            var number_relation = relations.get({
+                filter: function (item) {
+                    return item.from === node_id && item.label === "has_number";
+                }
+            })[0];
+
+            var number_node = nodes.get(number_relation.to)
+            return number_node.label
+        }
+
+        subject_nodes.forEach(function (item) {
+            var number = get_number(item.id);
+
+            var opt = document.createElement('option');
+            opt.innerHTML = number + ": " + item.label;
+            opt.dataset.label = item.label;
+            opt.value = number;
+
+            combo.appendChild(opt);
+            detailsCount += 1;
+        });
+    }
+
+    function loadOntologyToContainer(container, ontology) {
+        var result = initializeOntology(container, ontology);
+
+        container.getElementsByClassName('vis-network')[0].style.position = 'absolute';
+
+        setTimeout(function () {
+            result.network.fit();
+            $('#ontology-container').show();
+        }, 500);
+
+        return result;
+    }
+
+    function buildTaskOntology(data) {
+        var url = "{% url 'ontogen:generate_task' %}";
+        var subject_container = document.getElementById('subject');
+        var task_container = document.getElementById('task');
+
+        data["subject"] = ontologies.subject;
+
+        $.post(url, data, function (response) {
+            if (response.status === "OK") {
+                ontologies = response.result;
+
+                loadOntologyToContainer(subject_container, response.result.subject);
+                loadOntologyToContainer(task_container, response.result.task);
+            } else {
+                alert('Something went wrong');
+            }
+        });
+    }
+
+
     function showTab(n) {
         // This function will display the specified tab of the form ...
         var x = document.getElementsByClassName("tab");
         x[n].style.display = "block";
         // ... and fix the Previous/Next buttons:
-        // if (n == 0) {
-        //     document.getElementById("prevBtn").style.display = "none";
-        // } else {
-        //     document.getElementById("prevBtn").style.display = "inline";
-        // }
-        // if (n == (x.length - 1)) {
-        //     document.getElementById("nextBtn").innerHTML = "Submit";
-        // } else {
-        //     document.getElementById("nextBtn").innerHTML = "Next";
-        // }
-        // ... and run a function that displays the correct step indicator:
-        fixStepIndicator(n)
+        if (n === 0) {
+            document.getElementById("prevBtn").style.display = "none";
+        } else {
+            document.getElementById("prevBtn").style.display = "inline";
+        }
+        if (n === (x.length - 1)) {
+            document.getElementById("nextBtn").style.display = "none";
+        }
+        else {
+            document.getElementById("nextBtn").style.display = "inline";
+        }
     }
 
     function nextPrev(n) {
@@ -356,14 +430,44 @@
         showTab(currentTab);
     }
 
-    function fixStepIndicator(n) {
-        // This function removes the "active" class of all steps...
-        var i, x = document.getElementsByClassName("step");
-        for (i = 0; i < x.length; i++) {
-            x[i].className = x[i].className.replace(" active", "");
-        }
-        //... and adds the "active" class to the current step:
-        x[n].className += " active";
+    function exportCroppedImg(){
+        // create a temporary canvas sized to the cropped size
+        var canvas1=document.createElement('canvas');
+        var ctx1=canvas1.getContext('2d');
+        canvas1.width=crop_object.w;
+        canvas1.height=crop_object.h;
+
+        // use the extended from of drawImage to draw the
+        // cropped area to the temp canvas
+        ctx1.drawImage(
+            jcrop_target,
+            crop_object.x,crop_object.y,crop_object.w,crop_object.h,
+            0,0,crop_object.w,crop_object.h);
+
+        // return the .toDataURL of the temp canvas
+        return canvas1.toDataURL();
+    }
+
+    function upload_image() {
+        var url = "{% url 'ontogen:populate_subject_with_image' %}";
+
+        var combo = document.getElementById('subject-combo');
+        var node = combo.options[combo.selectedIndex].dataset.label;
+
+        var data = {
+            'node': node,
+            'subject': ontologies.subject,
+            'image': exportCroppedImg()
+        };
+
+        $.post(url, data, function (response) {
+            if (response.status === "OK") {
+                ontologies.subject = response.result.subject;
+                loadOntologyToContainer($("#subject")[0], ontologies.subject);
+            } else {
+                alert('Something went wrong');
+            }
+        });
     }
 </script>
 <style>
@@ -380,21 +484,10 @@
         flex: 0 1 50%;
     }
 
-    .vis {
-        background-color: red;
-
-        position:absolute;
-        width:100%;
-        height:100%;
-    }
-
-    .vis:empty {
-        display: none;
-    }
-
     #preview {
+        display: none;
         overflow:hidden;
-        display:block;
+        {#display:block;#}
         border: 1px solid lightgray;
         margin-top: 10px;
     }
@@ -405,10 +498,12 @@
     }
 
     #tab-container {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 230px;
+
         background-color: #ffffff;
         padding: 20px;
-        width: 100%;
-        min-width: 300px;
 
         border: 1px solid lightgray;
         border-radius: 5px;
@@ -416,64 +511,41 @@
 
     #ontology-container {
         margin-top: 10px;
-        flex-grow: 1;
+        flex: 1 1 auto;
 
         border: 1px solid lightgray;
         border-radius: 5px;
 
         overflow: hidden;
-        position:relative;
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
     }
 
-    #ontology-container:empty {
-        /*display: none;*/
+    #ontology-nav {
+        margin: -1px 0 0 0;
     }
-    
-    /* Style the input fields */
-    
-    #tab-container input {
-        padding: 10px;
-        width: 100%;
-        font-size: 17px;
-        font-family: Raleway;
-        border: 1px solid #aaaaaa;
+
+    #ont-tabs {
+        flex-grow: 1;
+        display: flex;
     }
-    
-    /* Mark input boxes that gets an error on validation: */
-    
-    #tab-container input.invalid {
-        background-color: #ffdddd;
+
+    #ont-tabs > div {
+        flex-grow: 1;
     }
-    
-    /* Hide all steps by default: */
-    
+
     .tab {
         display: none;
     }
-    
-    /* Make circles that indicate the steps of the form: */
-    
-    .step {
-        height: 15px;
-        width: 15px;
-        margin: 0 2px;
-        background-color: #bbbbbb;
-        border: none;
-        border-radius: 50%;
-        display: inline-block;
-        opacity: 0.5;
+
+    #nextPrev-container {
+        align-self: flex-end;
     }
-    
-    /* Mark the active step: */
-    
-    .step.active {
-        opacity: 1;
-    }
-    
-    /* Mark the steps that are finished and valid: */
-    
-    .step.finish {
-        background-color: #4CAF50;
+
+    .spacer {
+        flex-grow: 99;
     }
 </style>
 {% endblock %}

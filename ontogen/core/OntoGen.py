@@ -1,6 +1,8 @@
 import json
 import math
 
+from .Ontology import Ontology
+
 
 class InvalidDataError(Exception):
     def __init__(self):
@@ -98,7 +100,8 @@ class OntoGen:
         self.elements = elements
         concepts = self.get_elements_by_type(elements, 'concept')
         for concept in concepts:
-            self.add_node_with_number(concept['name'])
+            node = self.add_node_with_number(concept['name'])
+            node['attributes']['matched_text'] = concept['matched_text']
 
         relations = self.get_elements_by_type(elements, 'relation')
         for rel in relations:
@@ -111,6 +114,60 @@ class OntoGen:
                 self.construct_relation(
                     rel['name'], rel['source'], rel['destination']))
 
+    @staticmethod
+    def get_node_number(ontology, node):        
+        for relation in ontology.out_relations(node):
+            if relation['name'] == 'has_number':
+                return ontology.node_by_id(relation['destination_node_id'])['name']
+        else:
+            raise NameError()
+
+    def build_task_ontology(self, elements, subject_ont):
+        subject = Ontology.from_json(subject_ont)
+        task = Ontology()
+
+        prev_node = task.add_node('Начало')
+
+        def node_selector(text):
+            def select_node_by_text(node):
+                attr = node['attributes']
+                if 'matched_text' not in attr:
+                    return False
+                else:
+                    return attr['matched_text'] == text
+            return select_node_by_text
+
+        for relation in elements:
+            source_node = subject.select_single_node(
+                node_selector(relation['source']))
+            dest_node = subject.select_single_node(
+                node_selector(relation['destination']))
+
+            subject.add_relation(
+                relation['name'], source_node['id'], dest_node['id'])
+
+            if 'applied_name' not in relation:
+                continue
+
+            action = task.add_node(relation['applied_name'])
+            from_node = task.add_node(self.get_node_number(subject, source_node))
+            to_node = task.add_node(self.get_node_number(subject, dest_node))
+
+            task.add_relation(
+                'next', prev_node['id'], action['id']),
+            task.add_relation(
+                'from', action['id'], from_node['id']),
+            task.add_relation(
+                'to', action['id'], to_node['id'])
+
+            prev_node = action
+
+        end = task.add_node('Конец')
+        task.add_relation(
+            'next', prev_node['id'], end['id'])
+        
+        return task, subject
+
     def add_node_with_number(self, concept_name):
         node = self.construct_node(concept_name)
         number_node = self.construct_node(self.get_next_n())
@@ -118,6 +175,8 @@ class OntoGen:
         has_number_rel = self.construct_relation_by_ids(
             'has_number', node['id'], number_node['id'])
         self.relations.append(has_number_rel)
+
+        return node
 
     def get_subject_ontology(self):
         self.create_layout()
@@ -129,7 +188,7 @@ class OntoGen:
             "last_id": str(self.current_id),
         }
 
-        return json.dumps(ontology, ensure_ascii=False)  # , indent=4)
+        return ontology
 
     def get_number_node(self, node_name):
         node_id = self.get_node_id(node_name)

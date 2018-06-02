@@ -131,6 +131,9 @@ LOCALE_PATHS = (
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
+
 #################
 # Custom settings
 #################
@@ -147,3 +150,14 @@ CKEDITOR_CONFIGS = {
         'removeDialogTabs': 'image:advanced',
     },
 }
+
+SIMPLYFIRE_ADDRESS = ''
+SIMPLYFIRE_API_VERSION = ''
+SIMPLYFIRE_TOKEN = ''
+SIMPLYFIRE_PROJECT_ID = ''
+
+try:
+    from local_settings import *
+except ImportError:
+    print('[Warning] Unable to import local settings')
+    pass

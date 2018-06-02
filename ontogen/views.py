@@ -1,5 +1,10 @@
 import re
 import json
+import uuid
+import base64
+import datetime
+
+from django.utils import dateformat
 from django.http import HttpResponse, JsonResponse
 from django.utils import formats
 from django.forms import inlineformset_factory
@@ -10,10 +15,12 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import activate
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
 
 from .utils.decorators import ajax_only, ajax_login_only
 from .utils.decorators import ontogen_login_required, permission_check
 from .utils.helpers import ExtraContext
+from .utils.simplyfire import SimplyFireClient
 from .core import OntologyGenerator
 from . import models
 from . import forms
@@ -35,8 +42,7 @@ def ok_response(request):
 
 @ajax_login_only
 def get_tree_data(request):
-    tree = []
-    tree.append(models.get_resources())
+    tree = [models.get_resources()]
     return HttpResponse(json.dumps(tree), content_type="application/json")
 
 
@@ -48,7 +54,7 @@ def get_instruction_from_nodes(selected_nodes):
 
 def get_pattern_ids_from_nodes(selected_nodes):
     return [int(pattern_id) for
-        pattern_id in re.findall(r'pattern(\d+)', selected_nodes)]
+            pattern_id in re.findall(r'pattern(\d+)', selected_nodes)]
 
 
 def get_patterns_from_ids(pattern_ids):
@@ -64,8 +70,7 @@ def get_patterns_from_nodes(selected_nodes):
 @ontogen_login_required
 def generate_ont(request):
     selected_nodes = request.POST.get('checked_ids', None)
-    context = {}
-    context['error_message'] = ""
+    context = {'error_message': ""}
 
     try:
         instruction = get_instruction_from_nodes(selected_nodes)
@@ -74,7 +79,7 @@ def generate_ont(request):
         return render(request, 'ontogen/result.html', context)
 
     patterns = get_patterns_from_nodes(selected_nodes)
-    if patterns == []:
+    if not patterns:
         context['error_message'] = _('No patterns were selected')
         return render(request, 'ontogen/result.html', context)
 
@@ -131,7 +136,7 @@ def PatternCreateUpdateView(request, pattern_id=None):
         header = _('Add new pattern')
         extra_forms = 1
 
-    PatternFormSet = inlineformset_factory(
+    pattern_form_set = inlineformset_factory(
         models.Pattern,
         models.Mapping,
         fields=('mapping_label', 'mapping_value'), extra=extra_forms)
@@ -139,24 +144,25 @@ def PatternCreateUpdateView(request, pattern_id=None):
     if request.method == 'POST':
         form = forms.PatternForm(request.POST, instance=pattern)
         if form.is_valid():
-            formset = PatternFormSet(
+            formset = pattern_form_set(
                 request.POST, request.FILES, instance=pattern)
             if formset.is_valid():
                 form.save()
                 formset.save()
                 return HttpResponse("OK")
         else:
-            formset = PatternFormSet(request.POST, request.FILES)
+            formset = pattern_form_set(request.POST, request.FILES)
     else:
         if pattern_id:
             pattern = get_object_or_404(models.Pattern, pk=pattern_id)
         else:
             pattern = models.Pattern()
         form = forms.PatternForm(instance=pattern)
-        formset = PatternFormSet(instance=pattern)
+        formset = pattern_form_set(instance=pattern)
 
     return render(request, 'ontogen/pattern_form.html',
                   {'header': header, 'form': form, 'formset': formset})
+
 
 """
 Pattern CRUD views
@@ -193,6 +199,7 @@ def PatternUpdateView(request, pattern_id):
 class PatternDeleteView(edit.DeleteView):
     model = models.Pattern
     success_url = reverse_lazy('ontogen:ok')
+
 
 """
 Instructions CRUD views
@@ -245,6 +252,7 @@ def usage_history(request):
         'records': models.HistoryRecord.objects.all().order_by('-datetime')}
     return render(request, 'ontogen/history.html', context)
 
+
 @ontogen_login_required
 def generate_page(request):
     selected_nodes = request.POST.get('checked_ids', None)
@@ -264,12 +272,110 @@ def generate_subject_ont(request):
     text = request.POST['text']
     pattern_ids = request.POST.getlist('patterns[]')
 
-    print(pattern_ids)
-
     patterns = get_patterns_from_ids(pattern_ids)
-    ont = OntologyGenerator.generate_subject_ontology(text, patterns)
+    subject = OntologyGenerator.generate_subject_ontology(text, patterns)
+
+    ont_tag = request.user.username + "_" + dateformat.format(datetime.datetime.now(), 'H.i.s.u')
+    subject['tag'] = ont_tag
+
+    response = SimplyFireClient.post('files/createDirectory', {
+        'name': ont_tag
+    }, {
+        'path': 'resources/images/ont/'
+    })
+
+    if not response.ok:
+        return HttpResponse(status=500)
 
     return JsonResponse({
         'status': 'OK',
-        'result': ont,
+        'result': json.dumps(subject, ensure_ascii=False),
+    })
+
+
+@csrf_exempt
+@ajax_login_only
+def generate_task_ont(request):
+    try:
+        text = request.POST['text']
+        patterns = get_patterns_from_ids(request.POST.getlist('patterns[]'))
+        subject = request.POST['subject']
+    except KeyError:
+        return JsonResponse({
+            'status': 'FAIL',
+            'error': 'Invalid POST arguments given.'
+        })
+
+    task, subject = OntologyGenerator.generate_task_ontology(text, patterns, subject)
+
+    return JsonResponse({
+        'status': 'OK',
+        'result': {
+            'applied': 'applied',
+            'subject': subject.to_json_string(),
+            'task': task.to_json_string(),
+        }
+    })
+
+
+def get_image(request, image_id):
+    api_call = 'files/{}/download'.format(image_id)
+    response = SimplyFireClient.get(api_call)
+
+    django_response = HttpResponse(
+        content=response.content,
+        status=response.status_code,
+        content_type=response.headers['Content-Type']
+    )
+
+    return django_response
+
+
+@csrf_exempt
+@ajax_login_only
+def post_upload_image(request):
+    image_format, image_str = request.POST['image'].split(';base64,')
+    ext = image_format.split('/')[-1]
+
+    data = ContentFile(base64.b64decode(image_str), name='temp.' + ext)
+
+    response = SimplyFireClient.post_files('files/upload', {'File': data.file}, {'path': 'resources/images/'})
+
+    return JsonResponse(response.json())
+
+
+def upload_client_image(image, ont_tag):
+    image_format, image_str = image.split(';base64,')
+    ext = image_format.split('/')[-1]
+
+    file_name = '{0}.{1}'.format(str(uuid.uuid4()), ext)
+
+    data = ContentFile(base64.b64decode(image_str), name=file_name)
+    path = 'resources/images/ont/{}/'.format(ont_tag)
+    response = SimplyFireClient.post_files('files/upload', {'File': data}, {'path': path})
+    # response = SimplyFireClient.post_files('files/upload', {'File': data}, {})
+
+    if not response.ok:
+        return ""
+
+    return "/ontogen/resources/images/{}/".format(response.json()['response']['id'])
+
+
+@csrf_exempt
+@ajax_login_only
+def populate_subject_with_image(request):
+    subject_ont = request.POST['subject']
+    node_name = request.POST['node']
+    image = request.POST['image']
+
+    subject_json = json.loads(subject_ont)
+    image_url = upload_client_image(image, subject_json['tag'])
+
+    subject = OntologyGenerator.populate_with_image(subject_ont, node_name, image_url)
+
+    return JsonResponse({
+        'status': 'OK',
+        'result': {
+            'subject': subject.to_json_string(),
+        }
     })

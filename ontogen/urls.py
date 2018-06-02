@@ -49,4 +49,9 @@ urlpatterns = [
     url(r'^ok/', views.ok_response, name='ok'),
     url(r'^generate/$', views.generate_page, name='generate_new'),
     url(r'^generate_subject/$', views.generate_subject_ont, name='generate_subject'),
+    url(r'^generate_task/$', views.generate_task_ont, name='generate_task'),
+    url(r'^populate_subject_with_image/$', views.populate_subject_with_image, name='populate_subject_with_image'),
+    url(r'^resources/images/(?P<image_id>[0-9]+)/$', views.get_image, name='get_image'),
+    # url(r'^test_request/$', views.get_test_request, name='some_name'),
+    url(r'^test_upload/$', views.post_upload_image, name='test_upload'),
 ]

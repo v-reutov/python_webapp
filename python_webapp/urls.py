@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 # from django.contrib.auth.views import login
 
 urlpatterns = [
@@ -23,4 +25,4 @@ urlpatterns = [
     url(r'^ontogen/', include('ontogen.urls')),
     url(r'^sqrt/', include('sqrt_platform.urls')),
     # url(r'^accounts/login/$', login, {'template_name': 'admin/login.html'})
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

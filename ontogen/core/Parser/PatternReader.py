@@ -15,6 +15,11 @@ class PatternReader:
             'N': r'\d+',
             ' ': r'\s*'
         }
+
+        self.tokens_to_ignore = [
+            'DETAIL'
+        ]
+
         self.special_chars = [
             '(', ')'
         ]
@@ -63,7 +68,9 @@ class PatternReader:
         match = self.token_pattern.search(token)
         if match:
             tr_token, token_type = self.translate_token_s(match.group('token'))
-            if token_type == 'common':
+            if token_type == "ignore":
+                return token
+            elif token_type == 'common':
                 return r'(?P<{0}>\w+)<{1}>' \
                     .format(match.group('class'), tr_token)
             else:
@@ -88,6 +95,8 @@ class PatternReader:
             return (self.token_dictionary[token], 'common')
         elif token in self.special_tokens:
             return (self.special_tokens[token], 'special')
+        elif token in self.tokens_to_ignore:
+            return token, 'ignore'
         else:
             raise Exception('Unknown token: {}'.format(token))
 
