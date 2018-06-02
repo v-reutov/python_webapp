@@ -12,3 +12,6 @@ static/
 
 # Virtual env
 venv/
+
+# local django settings
+local_settings.py
