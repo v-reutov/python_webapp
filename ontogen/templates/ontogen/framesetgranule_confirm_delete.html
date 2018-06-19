@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="bot-modal-header">
+    <span class="mod-close" id="modal-close">&times;</span>
+    <h1>{% trans "Are you sure you want to delete frameset" %} "{{ object }}"?</h1>
+</div>
+<form action="" method="post" id="form">
+    {% csrf_token %}
+    <div class="submit-row" style="margin: 0">
+        <input id="submit-form-button" type="button" value="{% trans "Confirm" %}" class="default"/>
+    </div>
+</form>

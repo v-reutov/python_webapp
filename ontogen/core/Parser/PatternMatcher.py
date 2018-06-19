@@ -2,10 +2,15 @@ import re
 from pymystem3 import Mystem
 
 from ontogen.models import Pattern
+from ontogen.core.constants import MATCHED_TEXT_ATTR, MATCH_START_ATTR
+
 
 class PatternMatcher:
     def __init__(self):
         self.analyzer = Mystem()
+        self.known_issues = {
+            'гайк': 'гайка'
+        }
 
     def parse_text_from_file(self, filename, patterns):
         with open(filename, 'r', encoding='utf8') as source:
@@ -17,6 +22,8 @@ class PatternMatcher:
         results = DictSet()
         for pattern in patterns:
             results.add_range(self.apply_pattern(text, pattern))
+
+        results.items.sort(key=lambda item: item[MATCH_START_ATTR])
 
         return results.items
 
@@ -37,41 +44,48 @@ class PatternMatcher:
 
     def preprocess_text(self, text):
         text = text.strip().replace('\n', ' ').replace('  ', ' ')
-        analyzis = self.analyzer.analyze(text)
-        return self.format_analyzis(analyzis)
+        analysis = self.analyzer.analyze(text)
+        return self.format_analysis(analysis)
 
-    def format_analyzis(self, analyzis):
+    def format_analysis(self, analysis):
         strings = []
-        for item in analyzis:
+        for item in analysis:
             if 'analysis' in item:
                 gramar = next(iter(
                     re.findall(r'(\w+)', self.get_gr(item) or "") or []), "")
-                strings.append(self.get_lex(item) + '<' + gramar + '>')
+                lex = self.get_lex(item)
+                if lex in self.known_issues:
+                    lex = self.known_issues[lex]
+
+                strings.append(lex + '<' + gramar + '>')
             else:
                 strings.append(item['text'])
         return ''.join(strings)
 
     @staticmethod
     def apply_pattern(text, pattern):
-        def clear_mapping(mapping):
-            for opt_arg in re.findall(r'(\[.*?\])', mapping):
-                if 'None' in opt_arg:
-                    target = ""
-                else:
-                    target = opt_arg.lstrip('[').rstrip(']')
-                mapping = mapping.replace(opt_arg, target)
-            return mapping
-
         regex = re.compile(pattern['regex'])
-        matches = [(pattern['mappings'].format(**match.groupdict()), match.group(0))
+        matches = [(pattern['mappings'].format(**match.groupdict()), match)
                    for match in regex.finditer(text)]
         results = []
-        for match, matched_text in matches:
-            items = [('matched_text', matched_text)]
+        for mapping, match in matches:
+            items = [
+                (MATCHED_TEXT_ATTR, match.group(0).strip()),
+                (MATCH_START_ATTR, match.start(0)),
+            ]
             
-            for pair in match.split(Pattern.MAPPING_SEPARATOR):
-                name, mapping = pair.split('=')
-                items.append((name, clear_mapping(mapping)))
+            for pair in mapping.split(Pattern.MAPPING_SEPARATOR):
+                name, value = pair.split('=')
+
+                # clear mapping
+                for opt_arg in re.findall(r'(\[.*?\])', value):
+                    if 'None' in opt_arg:
+                        target = ""
+                    else:
+                        target = opt_arg.lstrip('[').rstrip(']')
+                    value = value.replace(opt_arg, target)
+
+                items.append((name, value))
             results.append(dict(items))
         return results
 
@@ -89,7 +103,7 @@ class PatternMatcher:
         return self.get_item(word, "gr")
 
 
-class DictSet():
+class DictSet:
     def __init__(self):
         self.items = []
 

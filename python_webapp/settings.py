@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'sqrt_platform.apps.SqrtPlatformConfig',
     'ckeditor',
+    'djangobower'
 ]
 
 MIDDLEWARE = [
@@ -133,6 +134,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
+
+BOWER_COMPONENTS_ROOT = '/PROJECT_ROOT/components/'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
+)
+
+# noinspection PyUnresolvedReferences
+BOWER_INSTALLED_APPS = (
+    'jquery',
+    'bootstrap#3.3.7',
+    'vis',
+    'underscore',
+    'Jcrop',
+    'ocrad-bower',
+    'jstree',
+    'jstree-bootstrap-theme',
+    'bootstrap-fileinput'
+)
 
 #################
 # Custom settings

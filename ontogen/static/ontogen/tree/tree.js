@@ -12,7 +12,7 @@ $(function () {
 				var index;
 				for (index = 0; index < siblings.length; index++) {
 					var node = data.instance.get_node(siblings[index]);
-					if (node.id != selected) {
+					if (node.id !== selected) {
 						data.instance.uncheck_node(node.id);
 					}
 				}
@@ -30,7 +30,7 @@ $(function () {
 						return {
 							"id": node.id
 						};
-					},
+					}
 				},
 				"animation": 0,
 				"check_callback": true,
@@ -47,16 +47,23 @@ $(function () {
 				"select_node": false,
 				"items": function ($node) {
 
-					active_node = $node;
+					var active_node = $node;
+                    var type = active_node.type;
 
-					if (active_node["type"] == "default")
+					if (type === "default" || type === "multimedia-container")
 						return null;
 
-					url = active_node["id"].replace(/(\d+)/, '/$1/');
-					modal = document.getElementById('modal-info');
+					var url = active_node["id"].replace(/(\d+)/, '/$1/');
+					var modal = document.getElementById('modal-info');
 
-					modal_load = function (content_url) {
-						$('#modal-content').load(content_url, function () {
+					var modal_load = function (content_url) {
+						$('#modal-content').load(content_url, function (response, status) {
+						    if (status === "error") {
+						        alert("Произошла ошибка :(");
+
+                                return;
+                            }
+
 							var hide_modal = function () {
 								modal.style.display = "none";
 							};
@@ -68,73 +75,95 @@ $(function () {
 									if (editor !== undefined) {
 										textarea.val(editor.getData());
 									}
-								});
+                                });
 
-								$.post(content_url, $('#form').serialize(), function (response) {
-									if (response == "OK") {
-										modal.style.display = "none";
-										refresh_tree('tree');
-									} else {
-										$("#modal-content").html(response);
-										document.getElementById("submit-form-button").onclick = submit_form;
-										document.getElementById("modal-close").onclick = hide_modal;
-									}
-								});
+                                var form = $('#form')[0];
+
+                                $.ajax({
+                                    url: content_url,
+                                    data: new FormData(form),
+                                    processData: false,
+                                    contentType: false,
+                                    type: 'POST',
+                                    success: function (response) {
+                                        if (response === "OK") {
+                                            modal.style.display = "none";
+                                            refresh_tree('tree');
+                                        } else if (response.errors !== undefined) {
+                                            $(".errorlist").empty();
+                                            _.each(response.errors, function (item) {
+                                                $(".errorlist").append('<li>' + item + '</li>');
+                                            });
+                                        } else {
+                                            $("#modal-content").html(response);
+                                            document.getElementById("submit-form-button").onclick = submit_form;
+                                            document.getElementById("modal-close").onclick = hide_modal;
+                                        }
+                                    }
+                                });
+                                // $.post(content_url, new FormData(form), function (response) {
+                                 //    if (response === "OK") {
+                                 //        modal.style.display = "none";
+								// 		refresh_tree('tree');
+								// 	} else {
+								// 		$("#modal-content").html(response);
+								// 		document.getElementById("submit-form-button").onclick = submit_form;
+								// 		document.getElementById("modal-close").onclick = hide_modal;
+								// 	}
+								// });
 							};
-							var submit = document.getElementById("submit-form-button")
-							var close = document.getElementById("modal-close")
+							var submit = document.getElementById("submit-form-button");
+							var close = document.getElementById("modal-close");
 
 							if (submit != null) submit.onclick = submit_form;
 							if (close != null) close.onclick = hide_modal;
 
 							modal.style.display = "block";
 						});
-					}
-
-					var items = {
-						getDetails: {
-							"separator_after": true,
-							"label": gettext("Details"),
-							"action": function (data) {
-								modal_load(url);
-							}
-						},
-						createNode: {
-							"label": gettext("Add"),
-							"action": function (obj) {
-								url = active_node["type"].match(/(\w+)-container/)[1] + "/add/"
-								modal_load(url);
-							}
-						},
-						editNode: {
-							"label": gettext("Edit"),
-							"action": function (obj) {
-								url = url + "edit/"
-								modal_load(url);
-							}
-						},
-						deleteNode: {
-							"label": gettext("Remove"),
-							"action": function (obj) {
-								url = url + "delete/"
-								modal_load(url);
-							}
-						}
 					};
 
-					if (!active_node["type"].match(/-container/)) {
-						delete items.createNode
-					} else {
-						delete items.editNode
-						delete items.deleteNode
-						delete items.getDetails
+					var items = { };
+
+					if (active_node["type"].match(/-container/)) {
+						items = {
+                            createNode: {
+                                "label": gettext("Add"),
+                                "action": function (obj) {
+                                    url = active_node["type"].match(/(\w+)-container/)[1] + "/add/"
+                                    modal_load(url);
+                                }
+                            }
+                        };
+                    } else {
+                        items = {
+                            getDetails: {
+                                "separator_after": true,
+                                "label": gettext("Details"),
+                                "action": function (data) {
+                                    modal_load(url);
+                                }
+                            },
+                            editNode: {
+                                "label": gettext("Edit"),
+                                "action": function (obj) {
+                                    modal_load(url + "edit/");
+                                }
+                            },
+                            deleteNode: {
+                                "label": gettext("Remove"),
+                                "action": function (obj) {
+                                    modal_load(url + "delete/");
+                                }
+                            }
+                        };
 					}
 
 					return items;
 				}
 			},
 			"conditionalselect": function (node) {
-				return node.children.length == 0;
+				// return node.children.length === 0;
+				return !node.original.type.match(/-container/);
 			},
 			"types": {
 				"pattern": {
@@ -146,12 +175,17 @@ $(function () {
 				"data": {
 					"icon": "glyphicon glyphicon-file"
 				},
+				"frameset": {
+                    "icon": false
+				},
 				"pattern-container": {},
 				"instruction-container": {},
+				"multimedia-container": {},
+                "frameset-container": {},
 				"default": {}
 			},
 			"plugins": [
-				"contextmenu", "types", "checkbox", "conditionalselect",
+				"contextmenu", "types", "checkbox", "conditionalselect"
 				// "wholerow"
 			]
 		});

@@ -3,549 +3,266 @@
 {% load static %}
 
 {% block content %}
-{% trans "Back to repository tree" as back_button %}
+    {% trans "Back to repository tree" as back_button %}
 
-{% comment %} <h1>{% trans "Generating ontology" %}</h1> {% endcomment %}
-{#<h1>Генерация прикладной онтологии</h1>#}
-<div id="split-wrapper">
-    <div>
-        {{ instruction.instruction_content | safe }}
-    </div>
-    <div id="rightBar">
-        <div id="tab-container">
-            <div class="tab">
-                <p><strong>Шаг 1. Построение предметной онтологии</strong></p>
-                <p>Выделите фрагмент инструкции, описывающий состав изделия.</p>
-                <input type="button" value="Построить предметную онтологию" onclick="buildOntology('subject');"/>
-            </div>
-            
-            <div class="tab">
-                <p><strong>Шаг 2. Обогащение предметной онтологии</strong></p>
-                <p>Предметную онтологию можно пополнить с помощью изображений.
-                    Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
-                    Выберите нужную деталь из выпадающего списка и нажмите "Привязать"
-                    для привязки выделенного изображения к детали агрегата.
-                </p>
-
-                <div class="form-inline">
-                    <div class="form-group">
-                        <label for="subject-combo">Деталь:</label>
-                        <select class="form-control" id="subject-combo">
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-default" style="margin-top: -2px;" onclick="upload_image();">Привязать</button>
+    <div id="split-wrapper">
+        <div>
+            {{ instruction.instruction_content | safe }}
+        </div>
+        <div id="rightBar">
+            <div id="tab-container">
+                <div class="tab">
+                    <p><strong>Шаг 1. Построение предметной онтологии</strong></p>
+                    <p>Выделите фрагмент инструкции, описывающий состав изделия.</p>
+                    <input type="button" value="Построить предметную онтологию" onclick="buildOntology('subject');"/>
                 </div>
 
-                <canvas id="preview"></canvas>
-                <p id="preview-ocr"></p>
+                <div class="tab">
+                    <p><strong>Шаг 2. Обогащение предметной онтологии</strong></p>
+                    <p>Предметную онтологию можно пополнить с помощью изображений.
+                        Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
+                        Выберите нужную деталь из выпадающего списка и нажмите "Привязать".
+                    </p>
+
+                    <div class="form-inline">
+                        <div class="form-group" style="width: calc(100% - 105px)">
+                            <label for="subject-combo" style="width: 50px">Деталь:</label>
+                            <select class="form-control" id="subject-combo" style="width: calc(100% - 55px)" disabled>
+                                <option value="-1">Прикладная онтология не построена</option>
+                            </select>
+                        </div>
+
+                        <button id="populate-subject-button"
+                                type="submit" class="btn btn-default" style="margin-top: -2px; width: 100px" disabled
+                                onclick="upload_image();">Привязать
+                        </button>
+                    </div>
+
+                    <canvas id="preview"></canvas>
+                    {#<p id="preview-ocr"></p>#}
+                </div>
+
+                <div class="tab">
+                    <p><strong>Шаг 3. Построение онтологии задачи</strong></p>
+                    <p>Выделите фрагмент инструкции, описывающий процесс сборки изделия.</p>
+                    <input id="build-task-button"
+                           type="button" value="Построить онтологию задачи" onclick="buildOntology('task');" disabled/>
+                </div>
+
+                <div class="tab">
+                    <p><strong>Шаг 4. Обогащение онтологии задачи</strong></p>
+                    <p>TODO text</p>
+
+                    <div class="form-inline">
+                        <div class="form-group" style="width: calc(100% - 115px)">
+                            <label for="task-combo" style="width: 80px">Шаг сборки:</label>
+                            <select class="form-control" id="task-combo" style="width: calc(100% - 85px)" disabled>
+                                <option value="-1">Онтология задачи не построена</option>
+                            </select>
+                        </div>
+
+                        <button id="populate-task-button"
+                                type="button" class="btn btn-default" data-toggle="modal" data-target="#task-modal"
+                                style="margin-top: -2px; width: 110px">
+                            Привязать...
+                        </button>
+                    </div>
+
+                    <div class="modal" id="task-modal" tabindex="-1" role="dialog"
+                         aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="task-modal-title">Привязка визуального
+                                        сопровождения</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="vis-method-combo">Способ визуализации:</label>
+                                            <select class="form-control" id="vis-method-combo"
+                                                onchange="onVisMethodChange()">
+                                                <option value="animation" selected>Анимация</option>
+                                                <option value="video">Видео</option>
+                                                <option value="vr">Сцена AR</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="vis-resource-combo">Данные визуализации:</label>
+                                            <select class="form-control" id="vis-resource-combo" disabled>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена
+                                    </button>
+                                    <button id="task-modal-submit" type="button" class="btn btn-primary" onclick="populateTaskOntology();">Привязать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab">
+                    <p><strong>Генерация завершена</strong></p>
+
+                    <input type="button" id="download-subject" value="Скачать предметную онтологию" disabled/>
+                    <input type="button" id="download-task" value="Скачать онтологию задачи" disabled/>
+
+                </div>
+
+                <div class="spacer"></div>
+
+                <div id="nextPrev-container" class="btn-group" role="group" aria-label="...">
+                    <button id="prevBtn" onclick="nextPrev(-1)" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                        Назад
+                    </button>
+                    <button id="nextBtn" onclick="nextPrev(1)" type="button" class="btn btn-default">
+                        Далее
+                        <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                    </button>
+                </div>
             </div>
-            
-            <div class="tab">
-                <p><strong>Шаг 3. Построение онтологии задачи</strong></p>
-                <p>Выделите фрагмент инструкции, описывающий процесс сборки изделия.</p>
-                <input type="button" value="Построить онтологию задачи" onclick="buildOntology('task');"/>
+
+            <div id="ontology-container">
+                <ul id="ontology-nav" class="nav nav-pills nav-justified">
+                    <li class="active"><a data-toggle="tab" href="#subject">Предметная онтология</a></li>
+                    <li><a data-toggle="tab" href="#task">Онтология задачи</a></li>
+                </ul>
+                <div id="ont-tabs" class="tab-content">
+                    <div id="subject" class="tab-pane active"></div>
+                    <div id="task" class="tab-pane"></div>
+                </div>
+
+                <button id="refresh-network" type="button" class="btn btn-default btn-lg" onclick="refreshNetwork();">
+                    <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                </button>
             </div>
-            
-            <div class="tab">
-                <p><strong>Генерация завершена</strong></p>
-
-                <input type="button" id="download-subject" value="Скачать предметную онтологию"/>
-                <input type="button" id="download-task" value="Скачать онтологию задачи"/>
-
-            </div>
-
-            <div class="spacer"></div>
-
-            <div id="nextPrev-container">
-                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Предыдущий шаг</button>
-                <button type="button" id="nextBtn" onclick="nextPrev(1)">Следующий шаг</button>
-            </div>
-
-            <!-- Circles which indicates the steps of the form: -->
-{#            <div style="text-align:center;margin-top:10px">#}
-{#                <span class="step"></span>#}
-{#                <span class="step"></span>#}
-{#                <span class="step"></span>#}
-{#                <span class="step"></span>#}
-{#            </div>#}
         </div>
-
-        <div id="ontology-container" style="display: none">
-            <ul id="ontology-nav" class="nav nav-pills nav-justified">
-                <li class="active"><a data-toggle="tab" href="#subject">Предметная онтология</a></li>
-                <li><a data-toggle="tab" href="#task">Онтология задачи</a></li>
-            </ul>
-            <div id="ont-tabs" class="tab-content">
-                <div id="subject" class="tab-pane active"></div>
-                <div id="task" class="tab-pane"></div>
-            </div>
-        </div>
-        <!-- <div id="subject-ontology-vis" class="vis"></div> -->
     </div>
-</div>
 
 {% endblock %}
 
 {% block head %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<script type="text/javascript" src="{% static 'ontogen/lib/jcrop/jquery.Jcrop.min.js' %}"></script>
-<link rel="stylesheet" href="{% static 'ontogen/lib/jcrop/jquery.Jcrop.min.css' %}">
+    <script type="text/javascript" src="{% static 'Jcrop/js/Jcrop.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'Jcrop/css/Jcrop.min.css' %}">
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+    <script type="text/javascript" src="{% static 'vis/dist/vis.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'vis/dist/vis.min.css' %}">
 
-<script type="text/javascript" src="{% static 'ontogen/ontology/visualize.js' %}"></script>
-<script type="text/javascript" src="{% static 'ontogen/lib/ocrad/ocrad.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ontogen/ontology/visualize.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ocrad-bower/ocrad.js' %}"></script>
 
-<script>
-    var patterns = JSON.parse('{{ patterns }}');
-    var ontologies = {
-        subject: '',
-        task: ''
-    };
+    <script>
+        var patterns = JSON.parse('{{ patterns }}');
 
-    var ontologies_data = {
-        subject: [],
-        task: []
-    };
+        var urls = {
+            generate_subject: "{% url 'ontogen:generate_subject' %}",
+            generate_task: "{% url 'ontogen:generate_task' %}",
+            populate_subject_with_image: "{% url 'ontogen:populate_subject_with_image' %}",
+            populate_task_with_method: "{% url 'ontogen:populate_task_with_method' %}",
 
-    var jcrop_api;
-    var jcrop_enabled = true;
-    var jcrop_target;
-
-    var crop_object;
-    var previewXStart;
-    var previewYStart;
-    var previewHeight;
-    var previewWidth;
-
-    var network;
-    var detailsCount;
-
-    var currentTab = 0; // Current tab is set to be the first tab (0)
-
-    $(document).ready(function () {
-        showTab(currentTab); // Display the current tab
-
-        function saveTextAsFile(prefix) {
-            var textToWrite = ontologies[prefix];
-            var textFileAsBlob = new Blob([textToWrite], {
-                type: 'text/plain'
-            });
-            var fileNameToSaveAs = prefix + "-ontology.ont";
-            var downloadLink = document.createElement("a");
-
-            downloadLink.download = fileNameToSaveAs;
-            downloadLink.innerHTML = "My Hidden Link";
-            window.URL = window.URL || window.webkitURL;
-            downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
-            downloadLink.onclick = destroyClickedElement;
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-        }
-
-        function destroyClickedElement(event) {
-            document.body.removeChild(event.target);
-        }
-
-        $("#download-subject").click(function (e) {
-            e.preventDefault();
-            saveTextAsFile("subject");
-        });
-
-        $("#download-task").click(function (e) {
-            e.preventDefault();
-            saveTextAsFile("applied");
-        });
-
-        $('img').each(function() {
-            this.onclick = function() {
-                if (!jcrop_enabled) return;
-
-                destroyJcropIfAny();
-                
-                jcrop_target = this;
-
-                $(this).Jcrop({
-                    onChange: updatePreview,
-                    onSelect: onSelectChanged
-                }, function() {
-                        jcrop_api = this;
-                    }
-                );
-            }
-        });
-
-        $(document).keyup(function(e) {
-            if (e.keyCode === 27) {
-                destroyJcropIfAny();
-            }
-        });
-
-        var canvas = $("#preview")[0];
-        
-        canvas.width  = 400;
-        canvas.height = 250;
-
-        canvas.style.height = canvas.height;
-        canvas.style.width = canvas.width;
-    });
-
-    function destroyJcropIfAny() {
-        if (jcrop_api !== undefined) {
-                jcrop_api.destroy();
-                jcrop_api = undefined;
-        }
-    }
-
-    function updatePreview(crop) {
-        if(parseInt(crop.w) > 0) {
-            crop_object = crop;
-
-            // Show image preview
-            var canvas = $("#preview")[0];
-            var context = canvas.getContext("2d");
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            
-            fitImageOn(canvas, jcrop_target, crop);
-        }
-    }
-
-    function onSelectChanged(crop) {
-        if(parseInt(crop.w) > 0) {
-            updatePreview(crop);
-            recognizeNumber();
-        }
-    }
-
-    function fitImageOn(canvas, imageObj, crop) {
-        var context = canvas.getContext("2d");
-
-        var imageAspectRatio = crop.w / crop.h;
-        var canvasAspectRatio = canvas.width / canvas.height;
-        var renderableHeight, renderableWidth, xStart, yStart;
-    
-        if(imageAspectRatio < canvasAspectRatio) {
-            renderableHeight = canvas.height;
-            renderableWidth = crop.w * (renderableHeight / crop.h);
-            xStart = (canvas.width - renderableWidth) / 2;
-            yStart = 0;
-        }
-    
-        else if(imageAspectRatio > canvasAspectRatio) {
-            renderableWidth = canvas.width
-            renderableHeight = crop.h * (renderableWidth / crop.w);
-            xStart = 0;
-            yStart = (canvas.height - renderableHeight) / 2;
-        }
-
-        else {
-            renderableHeight = canvas.height;
-            renderableWidth = canvas.width;
-            xStart = 0;
-            yStart = 0;
-        }
-
-        previewXStart = xStart;
-        previewYStart = yStart;
-        previewHeight = renderableHeight;
-        previewWidth  = renderableWidth;
-
-        context.drawImage(jcrop_target, crop.x, crop.y, crop.w, crop.h, xStart, yStart, renderableWidth, renderableHeight);
-    }
-
-    function recognizeNumber() {
-        var canvas = document.getElementById("preview");
-        var context = canvas.getContext("2d");
-        
-        var imageData = context.getImageData(previewXStart, previewYStart, previewWidth, previewHeight);
-
-        var regex = /\d+/g;
-
-        OCRAD(imageData, {
-            numeric: true
-        }, function(text) {
-            console.log(text);
-
-            var result;
-            while ((result = regex.exec(text)) !== null) {
-                  if (result[0] > 0 && result[0] <= detailsCount) {
-                    $('#subject-combo').val(result[0]);
-                    break;
-                }
-            }
-
-            {#document.getElementById('preview-ocr').innerText = text;#}
-        })
-    }
-
-    function buildOntology(kind) {
-        var text = window.getSelection().toString();
-
-        if (text === undefined || text === "") {
-            alert('{% trans "Текст не выбран" %}');
-            return;
-        }
-
-        var post_data = {
-            'text': text,
-            'patterns': patterns
+            get_all_framesets: '{% url 'ontogen:frameset_get_all' %}'
         };
 
-        if (kind === "subject") {
-            buildSubjectOntology(post_data);
-        } else if (kind === "task") {
-            buildTaskOntology(post_data);
-        } else {
-            alert("Unknown kind of ontology");
-        }
-    }
-
-    function buildSubjectOntology(data) {
-        var url = "{% url 'ontogen:generate_subject' %}";
-        var container = document.getElementById('subject');
-
-        $.post(url, data, function (response) {
-            if (response.status === "OK") {
-                ontologies.subject = response.result;
-                var result = loadOntologyToContainer(container, response.result);
-                ontologies_data.subject = result.data;
-
-                loadSubjectCombo();
-            } else {
-                alert('Something went wrong');
-            }
-        });
-    }
-
-    function isNumber(str) {
-        return /^(0|[1-9]\d*)$/.test(str);
-    }
-
-    function loadSubjectCombo() {
-        detailsCount = 0;
-
-        var combo = document.getElementById('subject-combo');
-
-        var nodes = ontologies_data.subject.nodes;
-        var relations = ontologies_data.subject.edges;
-
-        var subject_nodes = nodes.get({
-            filter: function (item) {
-                return isNumber(item.label) === false;
-            }
-        });
-
-        function get_number(node_id) {
-            var number_relation = relations.get({
-                filter: function (item) {
-                    return item.from === node_id && item.label === "has_number";
-                }
-            })[0];
-
-            var number_node = nodes.get(number_relation.to)
-            return number_node.label
-        }
-
-        subject_nodes.forEach(function (item) {
-            var number = get_number(item.id);
-
-            var opt = document.createElement('option');
-            opt.innerHTML = number + ": " + item.label;
-            opt.dataset.label = item.label;
-            opt.value = number;
-
-            combo.appendChild(opt);
-            detailsCount += 1;
-        });
-    }
-
-    function loadOntologyToContainer(container, ontology) {
-        var result = initializeOntology(container, ontology);
-
-        container.getElementsByClassName('vis-network')[0].style.position = 'absolute';
-
-        setTimeout(function () {
-            result.network.fit();
-            $('#ontology-container').show();
-        }, 500);
-
-        return result;
-    }
-
-    function buildTaskOntology(data) {
-        var url = "{% url 'ontogen:generate_task' %}";
-        var subject_container = document.getElementById('subject');
-        var task_container = document.getElementById('task');
-
-        data["subject"] = ontologies.subject;
-
-        $.post(url, data, function (response) {
-            if (response.status === "OK") {
-                ontologies = response.result;
-
-                loadOntologyToContainer(subject_container, response.result.subject);
-                loadOntologyToContainer(task_container, response.result.task);
-            } else {
-                alert('Something went wrong');
-            }
-        });
-    }
-
-
-    function showTab(n) {
-        // This function will display the specified tab of the form ...
-        var x = document.getElementsByClassName("tab");
-        x[n].style.display = "block";
-        // ... and fix the Previous/Next buttons:
-        if (n === 0) {
-            document.getElementById("prevBtn").style.display = "none";
-        } else {
-            document.getElementById("prevBtn").style.display = "inline";
-        }
-        if (n === (x.length - 1)) {
-            document.getElementById("nextBtn").style.display = "none";
-        }
-        else {
-            document.getElementById("nextBtn").style.display = "inline";
-        }
-    }
-
-    function nextPrev(n) {
-        // This function will figure out which tab to display
-        var x = document.getElementsByClassName("tab");
-        x[currentTab].style.display = "none";
-
-        // Increase or decrease the current tab by 1:
-        currentTab = currentTab + n;
-        // if you have reached the end of the form... :
-        if (currentTab >= x.length) {
-            return false;
-        }
-        // Otherwise, display the correct tab:
-        showTab(currentTab);
-    }
-
-    function exportCroppedImg(){
-        // create a temporary canvas sized to the cropped size
-        var canvas1=document.createElement('canvas');
-        var ctx1=canvas1.getContext('2d');
-        canvas1.width=crop_object.w;
-        canvas1.height=crop_object.h;
-
-        // use the extended from of drawImage to draw the
-        // cropped area to the temp canvas
-        ctx1.drawImage(
-            jcrop_target,
-            crop_object.x,crop_object.y,crop_object.w,crop_object.h,
-            0,0,crop_object.w,crop_object.h);
-
-        // return the .toDataURL of the temp canvas
-        return canvas1.toDataURL();
-    }
-
-    function upload_image() {
-        var url = "{% url 'ontogen:populate_subject_with_image' %}";
-
-        var combo = document.getElementById('subject-combo');
-        var node = combo.options[combo.selectedIndex].dataset.label;
-
-        var data = {
-            'node': node,
-            'subject': ontologies.subject,
-            'image': exportCroppedImg()
+        var strings = {
+            text_not_selected: '{% trans "Текст не выбран" %}'
         };
 
-        $.post(url, data, function (response) {
-            if (response.status === "OK") {
-                ontologies.subject = response.result.subject;
-                loadOntologyToContainer($("#subject")[0], ontologies.subject);
-            } else {
-                alert('Something went wrong');
-            }
-        });
-    }
-</script>
-<style>
-    #split-wrapper {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        height: 100%;
+    </script>
 
-        flex: 1 1 auto;
-    }
+    <script src="{% static 'ontogen/generate.js' %}"></script>
 
-    #split-wrapper > div {
-        flex: 0 1 50%;
-    }
+    <style>
+        #split-wrapper {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            height: 100%;
 
-    #preview {
-        display: none;
-        overflow:hidden;
-        {#display:block;#}
-        border: 1px solid lightgray;
-        margin-top: 10px;
-    }
+            flex: 1 1 auto;
+        }
 
-    #rightBar {
-        display: flex;
-        flex-direction: column;
-    }
+        #split-wrapper > div {
+            flex: 0 1 50%;
+        }
 
-    #tab-container {
-        display: flex;
-        flex-direction: column;
-        flex: 0 0 230px;
+        #preview {
+            display: none;
+            overflow: hidden;
+            border: 1px solid lightgray;
+            margin-top: 10px;
+        }
 
-        background-color: #ffffff;
-        padding: 20px;
+        #rightBar {
+            display: flex;
+            flex-direction: column;
+        }
 
-        border: 1px solid lightgray;
-        border-radius: 5px;
-    }
+        #tab-container {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 230px;
 
-    #ontology-container {
-        margin-top: 10px;
-        flex: 1 1 auto;
+            background-color: #ffffff;
+            padding: 20px;
 
-        border: 1px solid lightgray;
-        border-radius: 5px;
+            border: 1px solid lightgray;
+            border-radius: 5px;
 
-        overflow: hidden;
-        position: relative;
+            overflow: auto;
+        }
 
-        display: flex;
-        flex-direction: column;
-    }
+        #ontology-container {
+            margin-top: 10px;
+            flex: 1 1 auto;
 
-    #ontology-nav {
-        margin: -1px 0 0 0;
-    }
+            border: 1px solid lightgray;
+            border-radius: 5px;
 
-    #ont-tabs {
-        flex-grow: 1;
-        display: flex;
-    }
+            overflow: hidden;
+            position: relative;
 
-    #ont-tabs > div {
-        flex-grow: 1;
-    }
+            display: flex;
+            flex-direction: column;
+        }
 
-    .tab {
-        display: none;
-    }
+        #ontology-nav {
+            margin: -1px 0 0 0;
+        }
 
-    #nextPrev-container {
-        align-self: flex-end;
-    }
+        #ont-tabs {
+            flex-grow: 1;
+            display: flex;
+        }
 
-    .spacer {
-        flex-grow: 99;
-    }
-</style>
+        #ont-tabs > div {
+            flex-grow: 1;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        #nextPrev-container {
+            align-self: flex-end;
+        }
+
+        .spacer {
+            flex-grow: 99;
+        }
+
+        #refresh-network {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            z-index: 99;
+        }
+    </style>
 {% endblock %}

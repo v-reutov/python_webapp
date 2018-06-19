@@ -1,0 +1,20 @@
+{% load i18n %}
+<div class="bot-modal-header">
+    <span class="mod-close" id="modal-close">&times;</span>
+    <h1>{{ framesetgranule.name }}</h1>
+</div>
+<fieldset class="aligned">
+    <div class="form-row">
+        <div>
+            <div class="list-group">
+                <a href="#" class="list-group-item active">
+                    <span class="badge">{{ framesetgranule.elements.count }}</span>
+                    Frames
+                </a>
+                {% for frame in framesetgranule.elements.all %}
+                    <a href="#" class="list-group-item">{{ frame.url }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</fieldset>

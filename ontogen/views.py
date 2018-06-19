@@ -20,8 +20,9 @@ from django.core.files.base import ContentFile
 from .utils.decorators import ajax_only, ajax_login_only
 from .utils.decorators import ontogen_login_required, permission_check
 from .utils.helpers import ExtraContext
-from .utils.simplyfire import SimplyFireClient
-from .core import OntologyGenerator
+from .utils.simplyfire import *
+from .core import OntologyGenerator, OntologyBuilder, constants
+from .core.Ontology import Ontology
 from . import models
 from . import forms
 
@@ -42,8 +43,54 @@ def ok_response(request):
 
 @ajax_login_only
 def get_tree_data(request):
-    tree = [models.get_resources()]
+    tree = [get_resources()]
     return HttpResponse(json.dumps(tree), content_type="application/json")
+
+
+def get_multimedia_data():
+    return {
+        "text": _("Multimedia data"),
+        "type": "pattern-container",
+        "children": [
+            {
+                "id": "obj1",
+                "type": "data",
+                "text": "test2"
+            },
+            {
+                "id": "obj2",
+                "type": "data",
+                "text": "test3"
+            }
+        ],
+        "li_attr": {
+            "class": "select-multiple capitalized"
+        }
+    }
+
+
+def get_resources():
+    return {
+        "text": _("Resources"),
+        "type": "resource-root",
+        "children": [
+            models.Instruction.get_json_all(),
+            models.Pattern.get_json_all(),
+            {
+                "text": _("Multimedia"),
+                "type": "multimedia-container",
+                "children": [
+                    models.FramesetGranule.get_tree_json_all()
+                ],
+                "li_attr": {
+                    "class": "capitalized container"
+                }
+            }
+        ],
+        "li_attr": {
+            "class": "capitalized container"
+        }
+    }
 
 
 def get_instruction_from_nodes(selected_nodes):
@@ -149,7 +196,7 @@ def PatternCreateUpdateView(request, pattern_id=None):
             if formset.is_valid():
                 form.save()
                 formset.save()
-                return HttpResponse("OK")
+                return ok_response(request)
         else:
             formset = pattern_form_set(request.POST, request.FILES)
     else:
@@ -276,7 +323,7 @@ def generate_subject_ont(request):
     subject = OntologyGenerator.generate_subject_ontology(text, patterns)
 
     ont_tag = request.user.username + "_" + dateformat.format(datetime.datetime.now(), 'H.i.s.u')
-    subject['tag'] = ont_tag
+    subject.tag = ont_tag
 
     response = SimplyFireClient.post('files/createDirectory', {
         'name': ont_tag
@@ -284,12 +331,27 @@ def generate_subject_ont(request):
         'path': 'resources/images/ont/'
     })
 
+    subject_nodes = []
+    for node in subject.nodes:
+        if node['name'] != constants.NO_NAME_NODE:
+            continue
+
+        out_relations = Ontology.relations_as_dict(subject.out_relations(node))
+        name_node = subject.node_by_id(out_relations[constants.NAME_RELATION]['destination_node_id'])
+        number_node = subject.node_by_id(out_relations[constants.NUMBER_RELATION]['destination_node_id'])
+
+        subject_nodes.append({
+            'name': name_node['name'],
+            'number': number_node['name']
+        })
+
     if not response.ok:
         return HttpResponse(status=500)
 
     return JsonResponse({
         'status': 'OK',
-        'result': json.dumps(subject, ensure_ascii=False),
+        'result': subject.to_json_string(),
+        'subject_nodes': subject_nodes
     })
 
 
@@ -306,7 +368,7 @@ def generate_task_ont(request):
             'error': 'Invalid POST arguments given.'
         })
 
-    task, subject = OntologyGenerator.generate_task_ontology(text, patterns, subject)
+    task, subject, task_nodes = OntologyGenerator.generate_task_ontology(text, patterns, subject)
 
     return JsonResponse({
         'status': 'OK',
@@ -314,21 +376,25 @@ def generate_task_ont(request):
             'applied': 'applied',
             'subject': subject.to_json_string(),
             'task': task.to_json_string(),
+            'task_nodes': task_nodes
         }
     })
 
 
-def get_image(request, image_id):
-    api_call = 'files/{}/download'.format(image_id)
-    response = SimplyFireClient.get(api_call)
-
-    django_response = HttpResponse(
+def django_response(response):
+    return HttpResponse(
         content=response.content,
         status=response.status_code,
         content_type=response.headers['Content-Type']
     )
 
-    return django_response
+
+def get_file_from_repository(file_id):
+    return django_response(SimplyFireClient.get_file(file_id))
+
+
+def get_image(request, image_id):
+    return get_file_from_repository(image_id)
 
 
 @csrf_exempt
@@ -353,7 +419,6 @@ def upload_client_image(image, ont_tag):
     data = ContentFile(base64.b64decode(image_str), name=file_name)
     path = 'resources/images/ont/{}/'.format(ont_tag)
     response = SimplyFireClient.post_files('files/upload', {'File': data}, {'path': path})
-    # response = SimplyFireClient.post_files('files/upload', {'File': data}, {})
 
     if not response.ok:
         return ""
@@ -371,7 +436,7 @@ def populate_subject_with_image(request):
     subject_json = json.loads(subject_ont)
     image_url = upload_client_image(image, subject_json['tag'])
 
-    subject = OntologyGenerator.populate_with_image(subject_ont, node_name, image_url)
+    subject = OntologyBuilder.populate_with_image(subject_ont, node_name, image_url)
 
     return JsonResponse({
         'status': 'OK',
@@ -379,3 +444,93 @@ def populate_subject_with_image(request):
             'subject': subject.to_json_string(),
         }
     })
+
+
+def get_frameset(request, frameset_id):
+    frameset = get_object_or_404(models.FramesetGranule, pk=frameset_id)
+    return JsonResponse(frameset.to_json())
+
+
+def create_terminal_frameset(name, files):
+    path = SimplyFireClient.create_directory(name, 'resources/framesets/')
+
+    frameset = models.FramesetGranule(name=name, type=models.AbstractGranule.TERMINAL_TYPE)
+    frameset.first_frame = files[0].name
+    frameset.last_frame = files[-1].name
+    frameset.save()
+
+    for file in files:
+        file_id = SimplyFireClient.upload_file(file, path)
+        file_item = models.GranuleItem(url='resources/framesets/frame/{}'.format(file_id), granule=frameset)
+        file_item.save()
+
+    return frameset.id
+
+
+def add_frameset_view(request):
+    errors = []
+
+    if request.method == 'POST':
+        files = request.FILES.getlist('files')
+        name = request.POST.get('name', default='')
+        name = name.strip()
+
+        if len(name) == 0:
+            errors.append('Не указано имя')
+
+        if len(files) == 0:
+            errors.append('Файлы не выбраны')
+
+        if len(errors) == 0:
+            try:
+                create_terminal_frameset(name, files)
+            except SimplyFireError:
+                errors.append('Не удалось загрузить файлы')
+            else:
+                return ok_response(request)
+
+        return JsonResponse({
+            'errors': errors
+        })
+
+    return render(request, 'ontogen/frameset_create.html')
+
+
+class FramesetDeleteView(edit.DeleteView):
+    model = models.FramesetGranule
+    success_url = reverse_lazy('ontogen:ok')
+
+
+class FramesetDetailView(detail.DetailView):
+    model = models.FramesetGranule
+
+
+def get_frameset_frame(request, frame_id):
+    return get_file_from_repository(frame_id)
+
+
+def get_framesets(request):
+    framesets = models.FramesetGranule.objects.all()
+
+    return JsonResponse({
+        'framesets': [x.get_tree_json() for x in framesets]
+    })
+
+
+@csrf_exempt
+def populate_task_with_method(request):
+    task_ont = request.POST['task']
+    step_index = request.POST['step_index']
+
+    method = request.POST['method']
+    resource = request.POST['resource']
+
+    task = OntologyBuilder.populate_task_with_method(task_ont, step_index, method, resource)
+
+    return JsonResponse({
+        'status': 'OK',
+        'result': {
+            'task': task.to_json_string(),
+        }
+    })
+

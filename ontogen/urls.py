@@ -52,6 +52,17 @@ urlpatterns = [
     url(r'^generate_task/$', views.generate_task_ont, name='generate_task'),
     url(r'^populate_subject_with_image/$', views.populate_subject_with_image, name='populate_subject_with_image'),
     url(r'^resources/images/(?P<image_id>[0-9]+)/$', views.get_image, name='get_image'),
+
+    url(r'^resources/framesets/(?P<frameset_id>[0-9]+)/$', views.get_frameset, name='get_frameset'),
+    url(r'^resources/framesets/frame/(?P<frame_id>[0-9]+)/$', views.get_frameset_frame, name='get_frameset'),
+
     # url(r'^test_request/$', views.get_test_request, name='some_name'),
-    url(r'^test_upload/$', views.post_upload_image, name='test_upload'),
+    # url(r'^test_upload/$', views.post_upload_image, name='test_upload'),
+
+    url(r'^framesets/$', views.get_framesets, name='frameset_get_all'),
+    url(r'^frameset/add/$', views.add_frameset_view, name='frameset_add'),
+    url(r'^frameset/(?P<pk>[0-9]+)/$', views.FramesetDetailView.as_view(), name='frameset_detail'),
+    url(r'^frameset/(?P<pk>[0-9]+)/delete/$', views.FramesetDeleteView.as_view(), name='frameset_delete'),
+
+    url(r'^populate_task_with_method/$', views.populate_task_with_method, name='populate_task_with_method')
 ]

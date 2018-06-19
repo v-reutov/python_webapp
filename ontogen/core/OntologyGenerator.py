@@ -5,8 +5,10 @@ from copy import deepcopy
 
 from .Parser.PatternReader import PatternReader
 from .Parser.PatternMatcher import PatternMatcher
-from .OntoGen import OntoGen
 from .Ontology import Ontology
+from . import OntologyBuilder
+
+from .OntoGen import OntoGen  # TODO: remove this
 
 
 def append_index(pattern, index):
@@ -61,9 +63,9 @@ def resolve_names(patterns):
 def resolve_details(subject_ont, patterns):
     subject_ontology = Ontology.from_json(subject_ont)
     detail_names = [re.escape(x['attributes']['matched_text'])
-        for x in subject_ontology.nodes if 'matched_text' in x['attributes']]
+                    for x in subject_ontology.nodes if 'matched_text' in x['attributes']]
 
-    detail_regex_template = '(?P<{0}>' + '|'.join(detail_names) + ')'
+    detail_regex_template = '(?P<{0}>{1})(?: \((?P<{0}_number>\d+)\))?'.format('{0}', '|'.join(detail_names))
     dependency_regex = re.compile('DETAIL<(?P<alias>\w+)>')
 
     for pattern in patterns:
@@ -72,6 +74,10 @@ def resolve_details(subject_ont, patterns):
             pattern['regex'] = pattern['regex'].replace(
                 dependency.group(0),
                 detail_regex_template.format(dependency.group('alias')))
+            pattern['mappings'] = pattern['mappings'].replace(
+                '{' + dependency.group('alias') + '}',
+                '{' + dependency.group('alias') + '} [({' + dependency.group('alias') + '_number})]'
+            )
 
     return patterns
 
@@ -96,25 +102,22 @@ def generate_ontologies_from_text(text, pattern_set=None):
 
 def generate_subject_ontology(text, pattern_set):
     matcher = PatternMatcher()
-    builder = OntoGen()
 
     patterns = [pattern.get() for pattern in pattern_set if pattern.extracted_elements_type == pattern.CONCEPT]
-    patterns = resolve_names(patterns) # do i really need this anymore?
+    patterns = resolve_names(patterns)  # TODO: check if this is relevant
 
     matches = matcher.parse_text(text, patterns)
-    builder.parse_elements(matches)
-    return builder.get_subject_ontology()
+    return OntologyBuilder.build_subject_ontology(matches)
 
 
 def generate_task_ontology(text, pattern_set, subject_ont):
     matcher = PatternMatcher()
-    builder = OntoGen()
 
     patterns = [pattern.get() for pattern in pattern_set if pattern.extracted_elements_type == pattern.RELATION]
     patterns = resolve_details(subject_ont, patterns)
     
     matches = matcher.parse_text(text, patterns)
-    return builder.build_task_ontology(matches, subject_ont)
+    return OntologyBuilder.build_task_ontology(matches, subject_ont)
 
 
 def merge_ontologies(one, another):
@@ -129,16 +132,3 @@ def merge_ontologies(one, another):
         }
 
     return json.dumps(ontology, ensure_ascii=False)
-
-
-def populate_with_image(subject_ont, node_name, image_url):
-    subject = Ontology.from_json(subject_ont)
-
-    node = subject.node_by_name(node_name)
-
-    image_node = subject.add_node("[image] " + node_name)
-    image_node['attributes']['image_url'] = image_url
-
-    subject.add_relation("has_image", node['id'], image_node['id'])
-
-    return subject

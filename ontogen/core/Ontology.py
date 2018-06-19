@@ -1,16 +1,29 @@
 import json
+from typing import Dict, Any
 
 
 class Ontology:
+    raw_data: Dict[str, Any]
+
     def __init__(self):
         self.nodes = []
         self.relations = []
-        self.raw_data = {}
 
         self.last_id = 0
         self.default_namespace = ""
 
+        self.default_namespace = ""
+        self.ontology_namespaces = {
+            "default": self.default_namespace,
+            "ontolis-avis": "http://knova.ru/ontolis-avis",
+            "owl": "http://www.w3.org/2002/07/owl",
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns",
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema",
+            "xsd": "http://www.w3.org/2001/XMLSchema"
+        }
+
         self.tag = ""
+        self.raw_data = {"namespaces": self.ontology_namespaces}
 
     @classmethod
     def from_json(cls, json_data):
@@ -74,6 +87,21 @@ class Ontology:
         return self.__select_relations(
             lambda x: x["source_node_id"] == s_id)
 
+    @staticmethod
+    def relations_as_dict(relations):
+        result = {}
+
+        for relation in relations:
+            if relation['name'] not in result:
+                result[relation['name']] = relation
+            else:
+                if not isinstance(result[relation['name']], list):
+                    result[relation['name']] = [result[relation['name']]]
+
+                result[relation['name']].append(relation)
+
+        return result
+
     def in_relations(self, node):
         s_id = str(node["id"])
         return self.__select_relations(
@@ -84,8 +112,6 @@ class Ontology:
             if node["name"] == name:
                 return node
         return None
-
-
 
     def get_next_id(self):
         self.last_id += 1
@@ -114,8 +140,20 @@ class Ontology:
         self.relations.append(relation)
         return relation
 
+    def add_relation_by_nodes(self, name, source, destination, attr=None):
+        return self.add_relation(name, source['id'], destination['id'], attr)
+
     def add_relation_by_names(self, name, source, destination, attr=None):
         return self.add_relation(
             name,
             self.node_by_name(source)['id'],
             self.node_by_name(destination)['id'], attr)
+
+    def get_relation_by_nodes(self, source, destination):
+        relations = self.__select_relations(
+            lambda x: x['source_node_id'] == source['id'] and x['destination_node_id'] == destination['id'])
+
+        if len(relations) > 0:
+            return relations[0]
+        else:
+            return None
