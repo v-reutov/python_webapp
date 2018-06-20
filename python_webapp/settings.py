@@ -19,16 +19,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gevcm3y0f@63j+n+evxxb&42(n^^&-(q84oy4zzms@7w0af^%h'
+# TODO: setup a secret key
+SECRET_KEY = ''
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    '127.0.0.1', 'localhost',
-    'vreutov.pythonanywhere.com',
-]
+# TODO: setup allowed hosts
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -43,6 +40,8 @@ INSTALLED_APPS = [
     'ontogen.apps.OntogenConfig',
     'home.apps.HomeConfig',
     'sqrt_platform.apps.SqrtPlatformConfig',
+    'ckeditor',
+    'djangobower'
 ]
 
 MIDDLEWARE = [
@@ -129,3 +128,55 @@ LOCALE_PATHS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
+
+BOWER_COMPONENTS_ROOT = '/PROJECT_ROOT/components/'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
+)
+
+# noinspection PyUnresolvedReferences
+BOWER_INSTALLED_APPS = (
+    'jquery',
+    'bootstrap#3.3.7',
+    'vis',
+    'underscore',
+    'Jcrop',
+    'ocrad-bower',
+    'jstree',
+    'jstree-bootstrap-theme',
+    'bootstrap-fileinput'
+)
+
+#################
+# Custom settings
+#################
+
+# CKEditor
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+        'toolbar_Basic': [
+            ['NumberedList', 'BulletedList', '-', 'Image']
+        ],
+        'toolbar': 'Basic',
+        'removePlugins': 'elementspath',
+        'removeDialogTabs': 'image:advanced',
+    },
+}
+
+SIMPLYFIRE_ADDRESS = ''
+SIMPLYFIRE_API_VERSION = ''
+SIMPLYFIRE_TOKEN = ''
+SIMPLYFIRE_PROJECT_ID = ''
+
+try:
+    from local_settings import *
+except ImportError:
+    print('[Warning] Unable to import local settings')
+    pass

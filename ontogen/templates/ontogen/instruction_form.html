@@ -1,7 +1,16 @@
 {% load i18n %}
+{% load static %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+
 <style>
 #id_instruction_label {
     width : calc(100% - 170px);
+    box-sizing: border-box;
+}
+
+[data-field-id="id_instruction_content"] {
+    width : 100%;
     box-sizing: border-box;
 }
 </style>

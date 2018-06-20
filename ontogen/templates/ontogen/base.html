@@ -1,44 +1,45 @@
-{% load static %}
-{% load i18n %}
+{% load static %} {% load i18n %}
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Ontology Generator | VReutov</title>
-    {% block head %}
-    {% endblock %}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
-    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
-    <link rel="stylesheet" type="text/css" href="{% static 'ontogen/custom_base.css' %}" />
-    <link rel="shortcut icon" href="{%  static 'ontogen/favicon.ico' %}">
+    <script type="text/javascript" src='{% static 'jquery/dist/jquery.js' %}'></script>
+    <script type="text/javascript" src='{% static 'underscore/underscore-min.js' %}'></script>
+    <script type="text/javascript" src='{% static 'bootstrap/dist/js/bootstrap.min.js' %}'></script>
+    <link rel="stylesheet" href='{% static 'bootstrap/dist/css/bootstrap.min.css' %}'>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'ontogen/custom_base.css' %}"/>
+    <link rel="shortcut icon" href="{% static 'ontogen/favicon.ico' %}">
+    {% block head %} {% endblock %}
 </head>
 
 <body>
-    <div id="container">
-        <div id="header-block">
-            <div id="branding">
-                <h1 id="site-name"><a href="{% url 'ontogen:index' %}">OntoGen</a></h1>
-            </div>
-            <div id="user-tools">
-                {% comment %}Translators: User greetings{% endcomment %}
-                {% trans "Welcome" %},
-                {% if user.is_authenticated %}
-                    <strong>{{ user }}</strong>
-                {% else %}
-                    <strong>{% trans "guest" %},</strong>
-                {% endif %}    
-            </div>
+<div class="body-box">
+    <div class="header-row">
+        <div id="branding">
+            <h1>
+                <a href="{% url 'ontogen:index' %}">OntoGen</a>
+            </h1>
         </div>
-        <div id="navigation-block">
-            {% block navigation %}
-            {% endblock %}
+        <div id="user-block">
+            {% comment %}Translators: User greetings{% endcomment %} {% trans "Welcome" %},
+            {% if user.is_authenticated %}
+                <strong>{{ user }}</strong>
+            {% else %}
+                <strong>{% trans "guest" %},</strong>
+            {% endif %}
         </div>
-        <div id="content" class="colM">
-            {% block content %}
-            {% endblock %}
-        </div>
-        <div id="footer"></div>
     </div>
+    {# Important to keep navigation block empty by default! #}
+    <div id="navigation-block">{% block navigation %}{% endblock %}</div>
+    <div class="content-row">
+        {% block content %} {% endblock %}
+    </div>
+    <div class="footer-row">
+    </div>
+</div>
 </body>
+
 </html>

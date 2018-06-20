@@ -3,6 +3,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.contrib.auth.models import User
+from ckeditor.fields import RichTextField
+
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 from .core.Parser.PatternReader import PatternReader
 
@@ -10,6 +14,8 @@ from .core.Parser.PatternReader import PatternReader
 class Instruction(models.Model):
     instruction_label = models.CharField(_("instruction label"), max_length=50)
     instruction_text = models.TextField(_("instruction text"))
+    
+    instruction_content = RichTextField(_("instruction content"), default='')
 
     def __str__(self):
         return self.instruction_label
@@ -18,7 +24,20 @@ class Instruction(models.Model):
         return {
             "id": "instruction" + str(self.id),
             "type": "instruction",
-            "text": str(self)
+            "text": str(self),
+        }
+
+    @classmethod
+    def get_json_all(cls):
+        return {
+            "text": ugettext("Instructions"),
+            "type": "instruction-container",
+            "children": [
+                item.get_json() for item in Instruction.objects.all()
+            ],
+            "li_attr": {
+                "class": "select-single capitalized container"
+            }
         }
 
 
@@ -35,6 +54,8 @@ class Pattern(models.Model):
         (RELATION, _('Relation')),
     )
 
+    MAPPING_SEPARATOR = ';;;'
+
     extracted_elements_type = \
         models.CharField(
             _("extracted elements type"), max_length=50,
@@ -46,10 +67,11 @@ class Pattern(models.Model):
     def get(self):
         reader = PatternReader()
         regex = reader.parse_pattern(self.pattern_text)
-        pattern_mappings = ' '.join(
+        pattern_mappings = self.MAPPING_SEPARATOR.join(
             [mapping.get() for mapping in self.mappings.all()])
         if self.extracted_elements_type is not None:
-            pattern_mappings += ' type=' + self.extracted_elements_type
+            pattern_mappings += self.MAPPING_SEPARATOR \
+                + 'type=' + self.extracted_elements_type
         return {
             'name': self.pattern_label,
             'regex': regex,
@@ -60,6 +82,19 @@ class Pattern(models.Model):
             "id": "pattern" + str(self.id),
             "type": "pattern",
             "text": str(self)
+        }
+
+    @classmethod
+    def get_json_all(cls):
+        return {
+            "text": ugettext("Patterns"),
+            "type": "pattern-container",
+            "children": [
+                item.get_json() for item in Pattern.objects.all()
+            ],
+            "li_attr": {
+                "class": "select-multiple capitalized container"
+            }
         }
 
 
@@ -107,41 +142,81 @@ class HistoryRecord(models.Model):
         ordering = ('datetime', 'user')
 
 
-def get_instructions():
-    return {
-        "text": ugettext("Instructions"),
-        "type": "instruction-container",
-        "children": [
-            item.get_json() for item in Instruction.objects.all()
-        ],
-        "li_attr": {
-            "class": "select-single capitalized"
+class AbstractGranule(models.Model):
+    name = models.CharField(max_length=200)
+    # meta_data = JSONField()
+
+    CONTAINER_TYPE = 'cont'
+    TERMINAL_TYPE = 'term'
+
+    GRANULE_TYPES = (
+        (None, '-'),
+        (CONTAINER_TYPE, _('Container')),
+        (TERMINAL_TYPE, _('Terminal')),
+    )
+
+    type = models.CharField(max_length=4, choices=GRANULE_TYPES, default=TERMINAL_TYPE)
+
+    child_granules = models.ManyToManyField("self")
+
+    class Meta:
+        abstract = True
+
+    def get_elements(self):
+        if self.type == self.TERMINAL_TYPE:
+            return [str(x) for x in self.elements.all()]
+        else:  # self is a container
+            elements = []
+
+            for child in self.child_granules.all():
+                elements.append(child.get_elements())
+
+            return elements
+
+    def __str__(self):
+        return self.name
+
+
+class GranuleItem(models.Model):
+    url = models.CharField(max_length=200)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    granule = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.url
+
+
+class FramesetGranule(AbstractGranule):
+    first_frame = models.CharField(max_length=200)
+    last_frame = models.CharField(max_length=200)
+
+    elements = GenericRelation(GranuleItem)
+
+    def to_json(self):
+        return {
+            'first': self.first_frame,
+            'last': self.last_frame,
+            'elements': self.get_elements()
         }
-    }
 
-
-def get_patterns():
-    return {
-        "text": ugettext("Patterns"),
-        "type": "pattern-container",
-        "children": [
-            item.get_json() for item in Pattern.objects.all()
-        ],
-        "li_attr": {
-            "class": "select-multiple capitalized"
+    def get_tree_json(self):
+        return {
+            "id": "frameset" + str(self.id),
+            "type": "frameset",
+            "text": str(self),
         }
-    }
 
-
-def get_resources():
-    return {
-        "text": ugettext("Resources"),
-        "type": "resource-root",
-        "children": [
-            get_instructions(),
-            get_patterns(),
-        ],
-        "li_attr": {
-            "class": "capitalized"
+    @classmethod
+    def get_tree_json_all(cls):
+        return {
+            "text": ugettext("Framesets"),
+            "type": "frameset-container",
+            "children": [
+                item.get_tree_json() for item in cls.objects.all()
+            ],
+            "li_attr": {
+                "class": "select-multiple capitalized container"
+            }
         }
-    }

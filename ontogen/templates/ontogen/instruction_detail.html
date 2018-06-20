@@ -6,7 +6,8 @@
 <fieldset class="aligned">
     <div class="form-row">
         <div>
-            <textarea readonly name="_text">{{ instruction.instruction_text }}</textarea>
+            {{ instruction.instruction_content|safe }}
+            <!-- <textarea readonly name="_text">{{ instruction.instruction_text }}</textarea> -->
         </div>
     </div>
 </fieldset>

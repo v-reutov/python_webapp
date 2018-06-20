@@ -4,3 +4,14 @@ myvenv
 db.sqlite3
 .DS_Store
 .vscode
+
+static/
+
+# IntelliJ project data
+.idea/
+
+# Virtual env
+venv/
+
+# local django settings
+local_settings.py
