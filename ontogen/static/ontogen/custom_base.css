@@ -160,3 +160,12 @@ body {
 .split.justify {
     width: 50%;
 }
+
+.dropdown-menu > li {
+    list-style-type: none;
+    padding: 0;
+}
+
+.dropdown-menu > li.disabled > a {
+    cursor: not-allowed;
+}

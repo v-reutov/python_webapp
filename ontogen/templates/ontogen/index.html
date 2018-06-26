@@ -21,6 +21,13 @@
             <div class="help-box" style="float: right">
                 <!--<h3>Select resources you want to use and click the "Generate ontology" button</h3>-->
             </div>
+            {% if messages %}
+                <ul class="errorlist">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <div id="tree"></div>
             <div class="submit-row">
                 {% comment %}Translators: Button caption{% endcomment %}

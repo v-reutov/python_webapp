@@ -182,6 +182,7 @@ class AbstractGranule(models.Model):
 
 
 class GranuleItem(models.Model):
+
     url = models.CharField(max_length=200)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -210,6 +211,9 @@ class FramesetGranule(AbstractGranule):
             "id": "frameset" + str(self.id),
             "type": "frameset",
             "text": str(self),
+            "li_attr": {
+                "class": "no-select"
+            }
         }
 
     @classmethod

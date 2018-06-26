@@ -33,18 +33,24 @@ class SimplyFireClient:
 
     @classmethod
     def get(cls, request, params=None):
-        # return requests.get(cls.url(request), headers=cls.headers())
-        return requests.get(cls.__url(request), params=cls.__enhance_params(params))
+        try:
+            return requests.get(cls.__url(request), params=cls.__enhance_params(params))
+        except (requests.ConnectionError, requests.ConnectTimeout):
+            raise SimplyFireError
 
     @classmethod
     def post(cls, request, data, params=None):
-        # return requests.post(cls.url(request), data, headers=cls.headers())
-        return requests.post(cls.__url(request), json=data, params=cls.__enhance_params(params))
+        try:
+            return requests.post(cls.__url(request), json=data, params=cls.__enhance_params(params))
+        except (requests.ConnectionError, requests.ConnectTimeout):
+            raise SimplyFireError
 
     @classmethod
     def post_files(cls, request, files, params=None):
-        # return requests.post(cls.url(request), data, headers=cls.headers())
-        return requests.post(cls.__url(request), files=files, params=cls.__enhance_params(params))
+        try:
+            return requests.post(cls.__url(request), files=files, params=cls.__enhance_params(params))
+        except (requests.ConnectionError, requests.ConnectTimeout):
+            raise SimplyFireError
 
     @classmethod
     def __check_response(cls, response):
@@ -71,5 +77,6 @@ class SimplyFireClient:
 
     @classmethod
     def get_file(cls, file_id):
+        """Gets a file by gived id"""
         api_call = 'files/{}/download'.format(file_id)
         return SimplyFireClient.get(api_call)

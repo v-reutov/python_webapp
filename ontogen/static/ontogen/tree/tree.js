@@ -163,7 +163,8 @@ $(function () {
 			},
 			"conditionalselect": function (node) {
 				// return node.children.length === 0;
-				return !node.original.type.match(/-container/);
+				return !node.original.type.match(/-container/)
+					&& (node.li_attr.class === undefined || !node.li_attr.class.includes('no-select'));
 			},
 			"types": {
 				"pattern": {
@@ -176,7 +177,7 @@ $(function () {
 					"icon": "glyphicon glyphicon-file"
 				},
 				"frameset": {
-                    "icon": false
+                    "icon": "glyphicon glyphicon-file"
 				},
 				"pattern-container": {},
 				"instruction-container": {},

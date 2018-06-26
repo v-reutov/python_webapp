@@ -2,7 +2,8 @@
     margin: 1em;
 }
 
-.jstree li.container  > a.jstree-anchor > i.jstree-checkbox
+.jstree li.container > a.jstree-anchor > i.jstree-checkbox,
+.jstree li.no-select  > a.jstree-anchor > i.jstree-checkbox
 {
     display: none;
 }

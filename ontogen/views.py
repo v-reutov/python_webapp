@@ -8,7 +8,7 @@ from django.utils import dateformat
 from django.http import HttpResponse, JsonResponse
 from django.utils import formats
 from django.forms import inlineformset_factory
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import detail, edit
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
@@ -16,6 +16,7 @@ from django.utils.translation import activate
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
+from django.contrib import messages
 
 from .utils.decorators import ajax_only, ajax_login_only
 from .utils.decorators import ontogen_login_required, permission_check
@@ -69,6 +70,62 @@ def get_multimedia_data():
     }
 
 
+def get_models_stub():
+    return {
+        "text": _("3D models"),
+        "type": "pattern-container",
+        "children": [
+            {
+                "id": "model1",
+                "type": "frameset",
+                "text": "test2",
+                "li_attr": {
+                    "class": "no-select"
+                }
+            },
+            {
+                "id": "model2",
+                "type": "frameset",
+                "text": "test3",
+                "li_attr": {
+                    "class": "no-select"
+                }
+            }
+        ],
+        "li_attr": {
+            "class": "select-multiple container capitalized"
+        }
+    }
+
+
+def get_ar_assemblies_stub():
+    return {
+        "text": _("AR assemblies"),
+        "type": "pattern-container",
+        "children": [
+            {
+                "id": "obj1",
+                "type": "frameset",
+                "text": "test4",
+                "li_attr": {
+                    "class": "no-select"
+                }
+            },
+            {
+                "id": "obj2",
+                "type": "frameset",
+                "text": "test5",
+                "li_attr": {
+                    "class": "no-select"
+                }
+            }
+        ],
+        "li_attr": {
+            "class": "select-multiple container capitalized"
+        }
+    }
+
+
 def get_resources():
     return {
         "text": _("Resources"),
@@ -80,7 +137,9 @@ def get_resources():
                 "text": _("Multimedia"),
                 "type": "multimedia-container",
                 "children": [
-                    models.FramesetGranule.get_tree_json_all()
+                    models.FramesetGranule.get_tree_json_all(),
+                    get_models_stub(),
+                    get_ar_assemblies_stub(),
                 ],
                 "li_attr": {
                     "class": "capitalized container"
@@ -302,14 +361,38 @@ def usage_history(request):
 
 @ontogen_login_required
 def generate_page(request):
+
     selected_nodes = request.POST.get('checked_ids', None)
 
-    instruction = get_instruction_from_nodes(selected_nodes)
-    patterns = get_pattern_ids_from_nodes(selected_nodes)
+    errors = []
+    instruction = None
+
+    try:
+        instruction = get_instruction_from_nodes(selected_nodes)
+    except (IndexError, TypeError):
+        errors.append(_('No instruction was selected'))
+
+    patterns_ids = get_pattern_ids_from_nodes(selected_nodes)
+    if len(patterns_ids) == 0:
+        errors.append(_('No patterns were selected'))
+
+    patterns = get_patterns_from_ids(patterns_ids)
+
+    if len(list(filter(lambda x: x.extracted_elements_type == models.Pattern.CONCEPT, patterns))) == 0:
+        errors.append(_('No concept patterns were selected'))
+
+    if len(list(filter(lambda x: x.extracted_elements_type == models.Pattern.RELATION, patterns))) == 0:
+        errors.append(_('No relation patterns were selected'))
+
+    if len(errors) > 0:
+        for error in errors:
+            messages.add_message(request, messages.ERROR, error)
+
+        return redirect('ontogen:index')
 
     return render(request, 'ontogen/generate.html', {
         'instruction': instruction,
-        'patterns': json.dumps(patterns),
+        'patterns': json.dumps(patterns_ids),
     })
 
 
@@ -325,11 +408,13 @@ def generate_subject_ont(request):
     ont_tag = request.user.username + "_" + dateformat.format(datetime.datetime.now(), 'H.i.s.u')
     subject.tag = ont_tag
 
-    response = SimplyFireClient.post('files/createDirectory', {
-        'name': ont_tag
-    }, {
-        'path': 'resources/images/ont/'
-    })
+    try:
+        SimplyFireClient.create_directory(ont_tag, 'resources/images/ont/')
+    except SimplyFireError:
+        return JsonResponse({
+            'status': "ERROR",
+            'error': _('Error connecting to SimplyFire repository')
+        })
 
     subject_nodes = []
     for node in subject.nodes:
@@ -344,9 +429,6 @@ def generate_subject_ont(request):
             'name': name_node['name'],
             'number': number_node['name']
         })
-
-    if not response.ok:
-        return HttpResponse(status=500)
 
     return JsonResponse({
         'status': 'OK',
@@ -382,19 +464,20 @@ def generate_task_ont(request):
 
 
 def django_response(response):
-    return HttpResponse(
+    result = HttpResponse(
         content=response.content,
         status=response.status_code,
         content_type=response.headers['Content-Type']
     )
 
+    if 'content-disposition' in response.headers:
+        result['Content-Disposition'] = response.headers['content-disposition']
 
-def get_file_from_repository(file_id):
-    return django_response(SimplyFireClient.get_file(file_id))
+    return result
 
 
-def get_image(request, image_id):
-    return get_file_from_repository(image_id)
+def get_file_from_repository(request, pk):
+    return django_response(SimplyFireClient.get_file(pk))
 
 
 @csrf_exempt
@@ -503,10 +586,6 @@ class FramesetDeleteView(edit.DeleteView):
 
 class FramesetDetailView(detail.DetailView):
     model = models.FramesetGranule
-
-
-def get_frameset_frame(request, frame_id):
-    return get_file_from_repository(frame_id)
 
 
 def get_framesets(request):
