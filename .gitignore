@@ -6,6 +6,7 @@ db.sqlite3
 .vscode
 
 static/
+bower_components/
 
 # IntelliJ project data
 .idea/
