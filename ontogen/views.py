@@ -11,7 +11,7 @@ from django.forms import inlineformset_factory
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import detail, edit
 from django.utils.decorators import method_decorator
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import activate
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
