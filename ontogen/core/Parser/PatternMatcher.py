@@ -76,8 +76,7 @@ class PatternMatcher:
             
             for pair in mapping.split(Pattern.MAPPING_SEPARATOR):
                 name, value = pair.split('=')
-
-                # clear mapping
+                
                 for opt_arg in re.findall(r'(\[.*?\])', value):
                     if 'None' in opt_arg:
                         target = ""

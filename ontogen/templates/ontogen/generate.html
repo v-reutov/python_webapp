@@ -217,7 +217,7 @@
             populate_subject_with_image: "{% url 'ontogen:populate_subject_with_image' %}",
             populate_task_with_method: "{% url 'ontogen:populate_task_with_method' %}",
 
-            get_all_framesets: '{% url 'ontogen:frameset_get_all' %}'
+            get_all_framesets: "{% url 'ontogen:frameset_get_all' %}"
         };
 
         var strings = {
@@ -234,7 +234,6 @@
             var bar = $('#rightBarFixed');
 
             if (top < 50) {
-                {#$('#rightBarFixed').css('height', 'calc(100vh - ' + (65 - top) + 'px);');#}
                 bar.css('margin-top', '-' + top + 'px');
 
                 var value = 'calc(100vh - ' + (65 - top) + 'px)';
