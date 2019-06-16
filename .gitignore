@@ -5,7 +5,8 @@ db.sqlite3
 .DS_Store
 .vscode
 
-static/
+/static/
+bower_components/
 
 # IntelliJ project data
 .idea/
@@ -15,3 +16,5 @@ venv/
 
 # local django settings
 local_settings.py
+
+.mypy_cache/

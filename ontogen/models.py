@@ -128,10 +128,14 @@ class Ontology(models.Model):
             choices=ONTOLOGY_TYPES)
 
 
+def get_sentinel_user():
+    return User.objects.get_or_create(username='deleted')[0]
+
+
 class HistoryRecord(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User)
-    instruction = models.ForeignKey(Instruction)
+    user = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user))
+    instruction = models.ForeignKey(Instruction, on_delete=models.SET_NULL, null=True)
     patterns = models.ManyToManyField(Pattern)
     results = models.ManyToManyField(Ontology)
 
@@ -178,6 +182,7 @@ class AbstractGranule(models.Model):
 
 
 class GranuleItem(models.Model):
+
     url = models.CharField(max_length=200)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -206,6 +211,9 @@ class FramesetGranule(AbstractGranule):
             "id": "frameset" + str(self.id),
             "type": "frameset",
             "text": str(self),
+            "li_attr": {
+                "class": "no-select"
+            }
         }
 
     @classmethod

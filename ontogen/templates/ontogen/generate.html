@@ -10,138 +10,185 @@
             {{ instruction.instruction_content | safe }}
         </div>
         <div id="rightBar">
-            <div id="tab-container">
-                <div class="tab">
-                    <p><strong>Шаг 1. Построение предметной онтологии</strong></p>
-                    <p>Выделите фрагмент инструкции, описывающий состав изделия.</p>
-                    <input type="button" value="Построить предметную онтологию" onclick="buildOntology('subject');"/>
-                </div>
-
-                <div class="tab">
-                    <p><strong>Шаг 2. Обогащение предметной онтологии</strong></p>
-                    <p>Предметную онтологию можно пополнить с помощью изображений.
-                        Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
-                        Выберите нужную деталь из выпадающего списка и нажмите "Привязать".
-                    </p>
-
-                    <div class="form-inline">
-                        <div class="form-group" style="width: calc(100% - 105px)">
-                            <label for="subject-combo" style="width: 50px">Деталь:</label>
-                            <select class="form-control" id="subject-combo" style="width: calc(100% - 55px)" disabled>
-                                <option value="-1">Прикладная онтология не построена</option>
-                            </select>
-                        </div>
-
-                        <button id="populate-subject-button"
-                                type="submit" class="btn btn-default" style="margin-top: -2px; width: 100px" disabled
-                                onclick="upload_image();">Привязать
+            <div id="rightBarFixed">
+                <div id="tab-container">
+                    <div class="tab">
+                        <p><strong>Шаг 1. Построение предметной онтологии</strong></p>
+                        <p>Выделите фрагмент инструкции, описывающий состав изделия.</p>
+                        <button id="build-subject-button" type="submit" class="btn btn-default" onclick="buildOntology('subject');">
+                            Построить предметную онтологию
+                            <i id="build-subject-loader" class="fas fa-spinner fa-spin" style="margin-left: 5px; display: none"></i>
                         </button>
                     </div>
 
-                    <canvas id="preview"></canvas>
-                    {#<p id="preview-ocr"></p>#}
-                </div>
+                    <div class="tab">
+                        <p><strong>Шаг 2. Обогащение предметной онтологии</strong></p>
+                        <p>Предметную онтологию можно пополнить с помощью изображений.
+                            Нажмите на нужное изображение, затем выделите его часть зажав левую кнопку мыши.
+                            Выберите нужную деталь из выпадающего списка и нажмите "Привязать" => "Выделенное изображение".
+                        </p>
 
-                <div class="tab">
-                    <p><strong>Шаг 3. Построение онтологии задачи</strong></p>
-                    <p>Выделите фрагмент инструкции, описывающий процесс сборки изделия.</p>
-                    <input id="build-task-button"
-                           type="button" value="Построить онтологию задачи" onclick="buildOntology('task');" disabled/>
-                </div>
+                        <div class="form-inline">
+                            <div class="form-group" style="width: calc(100% - 105px)">
+                                <label for="subject-combo" style="width: 50px">Деталь:</label>
+                                <select class="form-control" id="subject-combo" style="width: calc(100% - 55px)" disabled>
+                                    <option value="-1">Прикладная онтология не построена</option>
+                                </select>
+                            </div>
 
-                <div class="tab">
-                    <p><strong>Шаг 4. Обогащение онтологии задачи</strong></p>
-                    <p>TODO text</p>
-
-                    <div class="form-inline">
-                        <div class="form-group" style="width: calc(100% - 115px)">
-                            <label for="task-combo" style="width: 80px">Шаг сборки:</label>
-                            <select class="form-control" id="task-combo" style="width: calc(100% - 85px)" disabled>
-                                <option value="-1">Онтология задачи не построена</option>
-                            </select>
+                            <div class="btn-group dropup" style="margin-top: -2px; width: 100px">
+                                <button id="populate-subject-button" type="button"
+                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false" disabled>
+                                    Привязать <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li class="disabled" id="upload-image-action">
+                                        <a href="#" onclick="upload_image();">Выделенное изображение</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-toggle="modal" data-target="#subject-modal">Выбрать модель...</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
-                        <button id="populate-task-button"
-                                type="button" class="btn btn-default" data-toggle="modal" data-target="#task-modal"
-                                style="margin-top: -2px; width: 110px">
-                            Привязать...
-                        </button>
-                    </div>
+                         <canvas id="preview"></canvas>
 
-                    <div class="modal" id="task-modal" tabindex="-1" role="dialog"
-                         aria-labelledby="myModalLabel">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span></button>
-                                    <h4 class="modal-title" id="task-modal-title">Привязка визуального
-                                        сопровождения</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <form>
-                                        <div class="form-group">
-                                            <label for="vis-method-combo">Способ визуализации:</label>
-                                            <select class="form-control" id="vis-method-combo"
-                                                onchange="onVisMethodChange()">
-                                                <option value="animation" selected>Анимация</option>
-                                                <option value="video">Видео</option>
-                                                <option value="vr">Сцена AR</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="vis-resource-combo">Данные визуализации:</label>
-                                            <select class="form-control" id="vis-resource-combo" disabled>
-                                            </select>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена
-                                    </button>
-                                    <button id="task-modal-submit" type="button" class="btn btn-primary" onclick="populateTaskOntology();">Привязать</button>
+                        <div class="modal" id="subject-modal" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="task-modal-title">Привязка модели</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="subject-model-combo">Модель:</label>
+                                                <select class="form-control" id="subject-model-combo">
+                                                    <option value="test" selected>Модель #1</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена
+                                        </button>
+                                        <button id="task-modal-submit" type="button" class="btn btn-primary">
+                                            Привязать
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="tab">
+                        <p><strong>Шаг 3. Построение онтологии задачи</strong></p>
+                        <p>Выделите фрагмент инструкции, описывающий процесс сборки изделия.</p>
+                        <button id="build-task-button" type="submit"
+                                class="btn btn-default" onclick="buildOntology('task');" disabled>
+                            Построить онтологию задачи
+                            <i id="build-task-loader" class="fas fa-spinner fa-spin" style="margin-left: 5px; display: none"></i>
+                        </button>
+                    </div>
+
+                    <div class="tab">
+                        <p><strong>Шаг 4. Обогащение онтологии задачи</strong></p>
+                        <p>Выберите нужный шаг инструкции из выпдающего списка и нажмите на кнопку "Привязать...", чтобы привязать к шагу интсрукции способ визуализации</p>
+
+                        <div class="form-inline">
+                            <div class="form-group" style="width: calc(100% - 115px)">
+                                <label for="task-combo" style="width: 80px">Шаг сборки:</label>
+                                <select class="form-control" id="task-combo" style="width: calc(100% - 85px)" disabled>
+                                    <option value="-1">Онтология задачи не построена</option>
+                                </select>
+                            </div>
+
+                            <button id="populate-task-button"
+                                    type="button" class="btn btn-default" data-toggle="modal" data-target="#task-modal"
+                                    style="margin-top: -2px; width: 110px" disabled>
+                                Привязать...
+                            </button>
+                        </div>
+
+                        <div class="modal" id="task-modal" tabindex="-1" role="dialog"
+                             aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="task-modal-title">Привязка визуального
+                                            сопровождения</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="vis-method-combo">Способ визуализации:</label>
+                                                <select class="form-control" id="vis-method-combo"
+                                                    onchange="onVisMethodChange()">
+                                                    <option value="animation" selected>Анимация</option>
+                                                    <option value="video">Видео</option>
+                                                    <option value="vr">Сцена AR</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="vis-resource-combo">Данные визуализации:</label>
+                                                <select class="form-control" id="vis-resource-combo" disabled>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена
+                                        </button>
+                                        <button id="task-modal-submit" type="button" class="btn btn-primary" onclick="populateTaskOntology();">Привязать</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab">
+                        <p><strong>Генерация завершена</strong></p>
+
+                        <input type="button" id="download-subject" value="Скачать предметную онтологию" disabled/>
+                        <input type="button" id="download-task" value="Скачать онтологию задачи" disabled/>
+
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div id="nextPrev-container" class="btn-group" role="group" aria-label="...">
+                        <button id="prevBtn" onclick="nextPrev(-1)" type="button" class="btn btn-default">
+                            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                            Назад
+                        </button>
+                        <button id="nextBtn" onclick="nextPrev(1)" type="button" class="btn btn-default">
+                            Далее
+                            <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                        </button>
+                    </div>
                 </div>
+                <div id="ontology-container">
+                    <ul id="ontology-nav" class="nav nav-pills nav-justified">
+                        <li class="active"><a data-toggle="tab" href="#subject">Предметная онтология</a></li>
+                        <li><a data-toggle="tab" href="#task">Онтология задачи</a></li>
+                    </ul>
+                    <div id="ont-tabs" class="tab-content">
+                        <div id="subject" class="tab-pane active"></div>
+                        <div id="task" class="tab-pane"></div>
+                    </div>
 
-                <div class="tab">
-                    <p><strong>Генерация завершена</strong></p>
-
-                    <input type="button" id="download-subject" value="Скачать предметную онтологию" disabled/>
-                    <input type="button" id="download-task" value="Скачать онтологию задачи" disabled/>
-
-                </div>
-
-                <div class="spacer"></div>
-
-                <div id="nextPrev-container" class="btn-group" role="group" aria-label="...">
-                    <button id="prevBtn" onclick="nextPrev(-1)" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-                        Назад
+                    <button id="refresh-network" type="button" class="btn btn-default btn-lg" onclick="refreshNetwork();">
+                        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
                     </button>
-                    <button id="nextBtn" onclick="nextPrev(1)" type="button" class="btn btn-default">
-                        Далее
-                        <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                    </button>
                 </div>
-            </div>
-
-            <div id="ontology-container">
-                <ul id="ontology-nav" class="nav nav-pills nav-justified">
-                    <li class="active"><a data-toggle="tab" href="#subject">Предметная онтология</a></li>
-                    <li><a data-toggle="tab" href="#task">Онтология задачи</a></li>
-                </ul>
-                <div id="ont-tabs" class="tab-content">
-                    <div id="subject" class="tab-pane active"></div>
-                    <div id="task" class="tab-pane"></div>
-                </div>
-
-                <button id="refresh-network" type="button" class="btn btn-default btn-lg" onclick="refreshNetwork();">
-                    <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-                </button>
             </div>
         </div>
     </div>
@@ -159,6 +206,8 @@
     <script type="text/javascript" src="{% static 'ontogen/ontology/visualize.js' %}"></script>
     <script type="text/javascript" src="{% static 'ocrad-bower/ocrad.js' %}"></script>
 
+    <link rel="stylesheet" href="{% static 'font-awesome/web-fonts-with-css/css/fontawesome-all.min.css' %}">
+
     <script>
         var patterns = JSON.parse('{{ patterns }}');
 
@@ -168,13 +217,33 @@
             populate_subject_with_image: "{% url 'ontogen:populate_subject_with_image' %}",
             populate_task_with_method: "{% url 'ontogen:populate_task_with_method' %}",
 
-            get_all_framesets: '{% url 'ontogen:frameset_get_all' %}'
+            get_all_framesets: "{% url 'ontogen:frameset_get_all' %}"
         };
 
         var strings = {
-            text_not_selected: '{% trans "Текст не выбран" %}'
+            text_not_selected: '{% trans "No text selected" %}'
         };
 
+
+
+        window.onscroll = function () {
+            var doc = document.documentElement;
+
+            var top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
+
+            var bar = $('#rightBarFixed');
+
+            if (top < 50) {
+                bar.css('margin-top', '-' + top + 'px');
+
+                var value = 'calc(100vh - ' + (65 - top) + 'px)';
+                bar.css('height', value);
+            }
+            else {
+                bar.css('margin-top', '-50px');
+                bar.css('height', 'calc(100vh - 15px)');
+            }
+        }
     </script>
 
     <script src="{% static 'ontogen/generate.js' %}"></script>
@@ -205,10 +274,18 @@
             flex-direction: column;
         }
 
+        #rightBarFixed {
+            position: fixed;
+            padding: 0 10px 10px;
+            height: calc(100vh - 65px);
+            display: flex;
+            flex-direction: column;
+        }
+
         #tab-container {
             display: flex;
             flex-direction: column;
-            flex: 0 0 230px;
+            flex: 0 0 300px;
 
             background-color: #ffffff;
             padding: 20px;

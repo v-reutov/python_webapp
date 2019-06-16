@@ -132,7 +132,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 
-BOWER_COMPONENTS_ROOT = '/PROJECT_ROOT/components/'
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_components')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
