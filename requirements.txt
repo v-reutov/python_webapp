@@ -18,7 +18,7 @@ pymystem3==0.1.5
 pyparsing==2.2.0
 requests==2.13.0
 six==1.10.0
-urllib3==1.22
+urllib3==1.26.5
 whitenoise==3.3.0
 wolframalpha==3.0
 xmltodict==0.11.0
